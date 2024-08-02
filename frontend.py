@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import font
 from IDeA_classes import SampleList
 import re
 
@@ -48,9 +49,55 @@ class LabelAndCombo(tk.Frame):
         self.combo = ttk.Combobox(self.parent, textvariable=var, values=choices, state='readonly')
         self.combo.pack()
 
+        return
+    
+
+class SFE_WellPicker(tk.Frame):
+
+    def handleTraySelection(self):
+        self.start_position.set(self.tray_selection.get()[:1] + self.start_position.get()[1:])
+        self.pos_choices = self.getPositionList()
+        self.combo.config(values = self.pos_choices)
+        return
+    
+    
+    def getPositionList(self):
+        rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        retval = [self.tray_selection.get()[:1] + row + str(pos) for row in rows for pos in range(1,13)]
+        return retval
+    
+
+    def __init__(self, parent, label):
+        self.parent = parent
+
+        
+        self.tray_selection = tk.StringVar(value = "BLUE")
+        self.start_position = tk.StringVar(value = "BA1")
+        self.pos_choices = self.getPositionList()
+
+        tk.Frame.__init__(self, self.parent)
+
+        self.label = tk.Label(self, text=label)
+        self.label.pack()
+
+        self.colorFrame = tk.Frame(self)
+        self.colorFrame.pack()
+
+        self.red_button = tk.Radiobutton(self.colorFrame, text="", var=self.tray_selection, value="R", fg='black', bg='red', width = 0, command=self.handleTraySelection)
+        self.green_button = tk.Radiobutton(self.colorFrame, text="", var=self.tray_selection, value="G", fg='black', bg='green', width = 0, command=self.handleTraySelection)
+        self.blue_button = tk.Radiobutton(self.colorFrame, text="", var=self.tray_selection, value="B", fg = 'black', bg='blue', width = 0, command=self.handleTraySelection)
+
+        self.red_button.pack(side = tk.LEFT)
+        self.green_button.pack(side = tk.LEFT)
+        self.blue_button.pack(side = tk.LEFT)
+
+        self.combo = ttk.Combobox(self, textvariable=self.start_position, values=self.pos_choices, state='readonly', width=10)
+        self.combo.pack()       
+
 
 
         return
+    
     
 
 class SFE_Head(tk.Frame):
@@ -79,9 +126,11 @@ class SFE_ListText(tk.Text):
         self.scrollbar.config(command=self.yview)
         
 
-        for name in sample_list.samplenames:
-            self.insert(tk.END, name + '\n')
+        for i, name in enumerate(sample_list.samplenames):
+            separator = '  | ' if i < 10 else ' | ' if i < 100 else '| '
+            self.insert(tk.END, str(i) + separator + name + '\n')
         
+        self.config(state = 'disabled')
 
         return
     
@@ -114,30 +163,12 @@ class SequenceFrontEnd:
 
     def __init__(self, parent, sample_list):
 
-        # self.sample_list = sample_list
-
         self.parent = parent
         self.sample_list = sample_list
-        self.tray_selection = tk.StringVar(value = "BLUE")
-        self.start_position = tk.StringVar(value = "BA1")
-
-        self.pos_choices = self.getPositionList()
 
         self.buildUI()
         return
     
-    def getPositionList(self):
-        rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-        retval = [self.tray_selection.get()[:1] + row + str(pos) for row in rows for pos in range(1,13)]
-        return retval
-
-
-    def handleTraySelection(self):
-        initial = self.tray_selection.get()[:1]
-        self.start_position.set(initial + self.start_position.get()[1:])
-        self.pos_choices = self.getPositionList()
-        self.start_well.combo.config(values = self.pos_choices)
-        return
 
 
     def buildUI(self):
@@ -159,11 +190,13 @@ class SequenceFrontEnd:
         self.list_frame = SFE_ListFrame(self.left_frame, self.sample_list)
         self.list_frame.pack()
 
-        self.start_well = LabelAndCombo(self.right_frame, label = "Start Pos", var = self.start_position, choices = self.pos_choices)
-        self.start_well.pack()
+        self.start_well_picker = SFE_WellPicker(self.right_frame, "Starting Well")
+        self.start_well_picker.pack()
+        
+        self.start_pool_picker = SFE_WellPicker(self.right_frame, "Pool Well")
+        self.start_pool_picker.pack()
 
-        self.tray_selector = SFE_TrayPicker(self.right_frame, self.tray_selection, self.handleTraySelection)
-        self.tray_selector.pack()
+
 
         self.exit_button = tk.Button(self.bottom_frame, text = "Exit", command = self.parent.destroy)
         self.exit_button.pack()
