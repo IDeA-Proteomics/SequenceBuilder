@@ -9,6 +9,7 @@ import shutil
 import time
 import sys
 from IDeA_classes import SampleList
+import frontend
 
 parser = argparse.ArgumentParser()
 parser.add_argument("sampleList")
@@ -144,6 +145,7 @@ substr = "_SampleList"
 
 a = SampleList(args.sampleList)
 project_name = a.basename.split(substr)[0]
+frontend.showSeqFE(a)
 a2 = InjectionSequence(project_name, a.samplenames, arg2.tray, arg2.start_index, arg2.pool_well)
 print(project_name)
 [print(x) for x in a.samplenames]
