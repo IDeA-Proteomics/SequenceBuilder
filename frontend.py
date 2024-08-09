@@ -93,9 +93,6 @@ class SFE_WellPicker(tk.Frame):
 
         self.combo = ttk.Combobox(self, textvariable=self.start_position, values=self.pos_choices, state='readonly', width=10)
         self.combo.pack()       
-
-
-
         return
     
     
@@ -134,6 +131,23 @@ class SFE_ListText(tk.Text):
 
         return
     
+class SFE_MethodChooser(tk.Frame):
+
+    def __init__(self, parent):
+
+        self.parent = parent
+
+        self.methods = ["Method 1", "Method 2", "Method 3"]
+
+        self.method_choice = tk.StringVar(value = self.methods[0])
+
+        tk.Frame.__init__(self, self.parent)
+
+        self.combo = ttk.Combobox(self, textvariable=self.method_choice, values=self.methods, state='readonly', width=20)
+        self.combo.pack(side = tk.LEFT, anchor=tk.W)
+
+        return
+    
 
 class SFE_ListFrame(tk.Frame):
 
@@ -165,6 +179,7 @@ class SequenceFrontEnd:
 
         self.parent = parent
         self.sample_list = sample_list
+        self.gpf = tk.IntVar(value=0)
 
         self.buildUI()
         return
@@ -196,7 +211,12 @@ class SequenceFrontEnd:
         self.start_pool_picker = SFE_WellPicker(self.right_frame, "Pool Well")
         self.start_pool_picker.pack()
 
+        self.gpf_check = tk.Checkbutton(self.right_frame, text="Include GPF", variable=self.gpf, 
+                             onvalue=1, offvalue=0)
+        self.gpf_check.pack()
 
+        self.method_chooser = SFE_MethodChooser(self.right_frame)
+        self.method_chooser.pack()
 
         self.exit_button = tk.Button(self.bottom_frame, text = "Exit", command = self.parent.destroy)
         self.exit_button.pack()

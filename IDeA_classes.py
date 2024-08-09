@@ -76,7 +76,9 @@ class SampleList():
       val = self.sheet.cell(row = i, column = j).value
       if val is None:
         break
-      w.append(re.sub(r"\s+", '_', val))
+      if val[0].isdigit():
+        val = "S" + val
+      w.append(re.sub(r"[ +\[\]]+", '_', val))
       i +=1
     return(w)
   
