@@ -1,12 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font
-from IDeA_classes import SampleList
+# from IDeA_classes import SampleList
+from backend import *
 import re
 
 ### 1 = RED
 ### 2 - GREEN
 ### 3 - BLUE
+
+frame_options = {'highlightbackground':'black' , 'highlightthickness':1}
 
 class SFE_TrayPicker(tk.Frame):
 
@@ -56,8 +59,11 @@ class SFE_WellPicker(tk.Frame):
 
     def handleTraySelection(self):
         self.start_position.set(self.tray_selection.get()[:1] + self.start_position.get()[1:])
+        
+        self.pool_position.set(self.tray_selection.get()[:1] + self.pool_position.get()[1:])
         self.pos_choices = self.getPositionList()
         self.combo.config(values = self.pos_choices)
+        self.pool_combo.config(values = self.pos_choices)
         return
     
     
@@ -67,18 +73,19 @@ class SFE_WellPicker(tk.Frame):
         return retval
     
 
-    def __init__(self, parent, label):
+    def __init__(self, parent):
         self.parent = parent
 
         
         self.tray_selection = tk.StringVar(value = "BLUE")
         self.start_position = tk.StringVar(value = "BA1")
+        self.pool_position = tk.StringVar(value = "BH12")
         self.pos_choices = self.getPositionList()
 
         tk.Frame.__init__(self, self.parent)
 
-        self.label = tk.Label(self, text=label)
-        self.label.pack()
+        self.tray_label = tk.Label(self, text="Tray Selection")
+        self.tray_label.pack()
 
         self.colorFrame = tk.Frame(self)
         self.colorFrame.pack()
@@ -90,9 +97,21 @@ class SFE_WellPicker(tk.Frame):
         self.red_button.pack(side = tk.LEFT)
         self.green_button.pack(side = tk.LEFT)
         self.blue_button.pack(side = tk.LEFT)
+        self.blue_button.select()
+
+        self.start_label = tk.Label(self, text="Start Well")
+        self.start_label.pack()
 
         self.combo = ttk.Combobox(self, textvariable=self.start_position, values=self.pos_choices, state='readonly', width=10)
-        self.combo.pack()       
+        self.combo.pack()   
+
+        self.pool_label = tk.Label(self, text="Pool Well")
+        self.pool_label.pack()
+
+        self.pool_combo = ttk.Combobox(self, textvariable=self.pool_position, values=self.pos_choices, state='readonly', width=10)   
+        self.pool_combo.pack()
+
+         
         return
     
     
@@ -119,13 +138,12 @@ class SFE_ListText(tk.Text):
         self.parent = parent
         self.scrollbar = tk.Scrollbar(self.parent)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        tk.Text.__init__(self, self.parent, height=10, width=50, yscrollcommand=self.scrollbar.set)  
+        # tk.Text.__init__(self, self.parent, height=40, width=100, yscrollcommand=self.scrollbar.set)  
+        tk.Text.__init__(self, self.parent, yscrollcommand=self.scrollbar.set)  
         self.scrollbar.config(command=self.yview)
         
-
-        for i, name in enumerate(sample_list.samplenames):
-            separator = '  | ' if i < 10 else ' | ' if i < 100 else '| '
-            self.insert(tk.END, str(i) + separator + name + '\n')
+        for i in range(sample_list.getSampleCount()):
+            self.insert(tk.END, "{:>3}| {:>5}| {:>24}| {:>24}\n".format(i, sample_list.getData('sample number', i), sample_list.getData('sample name', i), sample_list.getData('method', i)))
         
         self.config(state = 'disabled')
 
@@ -157,7 +175,7 @@ class SFE_ListFrame(tk.Frame):
         tk.Frame.__init__(self, self.parent)
 
         sfe_list_text = SFE_ListText(self, sample_list)
-        sfe_list_text.pack()
+        sfe_list_text.pack(fill=tk.BOTH,expand=True)
         # sfe_list_text.insert(tk.END, "Text Here")
 
         return
@@ -175,27 +193,33 @@ class SFE_OptionFrame(tk.Frame):
 
 class SequenceFrontEnd:
 
-    def __init__(self, parent, sample_list):
+    def __init__(self, parent):
 
         self.parent = parent
-        self.sample_list = sample_list
+        self.sample_list = SampleList()
         self.gpf = tk.IntVar(value=0)
 
         self.buildUI()
+        return
+    
+    def buildSequence(self):
+
+        
+
         return
     
 
 
     def buildUI(self):
 
-        self.main_frame = tk.Frame(self.parent)
-        self.left_frame = tk.Frame(self.main_frame)
-        self.right_frame = tk.Frame(self.main_frame)
-        self.bottom_frame = tk.Frame(self.parent)
+        self.main_frame = tk.Frame(self.parent, **frame_options)
+        self.left_frame = tk.Frame(self.main_frame, **frame_options)
+        self.right_frame = tk.Frame(self.main_frame, **frame_options)
+        self.bottom_frame = tk.Frame(self.parent, **frame_options)
 
-        self.main_frame.pack(side = tk.TOP)
-        self.left_frame.pack(side = tk.LEFT)
-        self.right_frame.pack(side = tk.LEFT)
+        self.main_frame.pack(side = tk.TOP, fill=tk.BOTH, expand=True)
+        self.left_frame.pack(side = tk.LEFT, anchor=tk.W, fill=tk.BOTH, expand=True)
+        self.right_frame.pack(side = tk.RIGHT, anchor=tk.E)
         self.bottom_frame.pack(side = tk.TOP)
 
 
@@ -203,13 +227,10 @@ class SequenceFrontEnd:
         self.head.pack(side = tk.TOP, anchor=tk.W)
 
         self.list_frame = SFE_ListFrame(self.left_frame, self.sample_list)
-        self.list_frame.pack()
+        self.list_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
-        self.start_well_picker = SFE_WellPicker(self.right_frame, "Starting Well")
+        self.start_well_picker = SFE_WellPicker(self.right_frame)
         self.start_well_picker.pack()
-        
-        self.start_pool_picker = SFE_WellPicker(self.right_frame, "Pool Well")
-        self.start_pool_picker.pack()
 
         self.gpf_check = tk.Checkbutton(self.right_frame, text="Include GPF", variable=self.gpf, 
                              onvalue=1, offvalue=0)
@@ -226,9 +247,9 @@ class SequenceFrontEnd:
 
 
 
-def showSeqFE(sample_list):
+def showSeqFE():
     root = tk.Tk()
-    front_end = SequenceFrontEnd(root, sample_list)
+    front_end = SequenceFrontEnd(root)
     root.mainloop()
 
 def main():
