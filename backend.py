@@ -2,17 +2,26 @@ import pandas as pd
 import openpyxl
 import os
 
+import frontend
+
 class SampleList():
 
-    def __init__(self):
+    def __init__(self, front):
+        self.front = front
         self.path = "~/Automate/BothnerB_022823_SampleList.xlsx"
         self.abs_path = os.path.abspath(self.path)
         self.project_name = "Not Yet"
 
         self.data = pd.read_excel(self.path, engine='openpyxl')
-        self.list = self.data[['sample number', 'sample name']].copy()
+        self.list = pd.DataFrame(data=self.data[['sample number', 'sample name']].values, columns=['number', 'name'])
+        self.list['method'] = "None"
+        self.list['position'] = "NA"
 
-        self.list['method'] = "No_Method_Selected"
+        return
+    
+    def reBuildList(self):
+
+        self.list['position'] = self.front.getSamplePositions()
 
         return
     

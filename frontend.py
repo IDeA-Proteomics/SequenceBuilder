@@ -61,20 +61,41 @@ class SFE_WellPicker(tk.Frame):
         self.start_position.set(self.tray_selection.get()[:1] + self.start_position.get()[1:])
         
         self.pool_position.set(self.tray_selection.get()[:1] + self.pool_position.get()[1:])
-        self.pos_choices = self.getPositionList()
-        self.combo.config(values = self.pos_choices)
-        self.pool_combo.config(values = self.pos_choices)
+        self.rebuildSelections()
         return
     
+    def rebuildSelections(self, event=None):
+        self.pos_choices = self.getPositionList()
+        self.combo_vals = self.pos_choices[:97-self.count]
+        self.combo.config(values = self.combo_vals)
+        self.pool_vals = [i for i in self.pos_choices if i not in self.getSamplePosistions()]
+        self.pool_combo.config(values = self.pool_vals)
+        if self.pool_position.get() not in self.pool_vals:
+            self.pool_position.set(self.pool_vals[-1])
+
+        return
+    
+    def onStartChange(self, event):
+        self.rebuildSelections()
+        self.onStartChangeCallback()
+        return
     
     def getPositionList(self):
         rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
         retval = [self.tray_selection.get()[:1] + row + str(pos) for row in rows for pos in range(1,13)]
         return retval
     
+    def getSamplePosistions(self):
 
-    def __init__(self, parent):
+        pos_list = self.getPositionList()
+        idx = pos_list.index(self.start_position.get())
+        
+        return pos_list[idx:idx+self.count]
+
+    def __init__(self, parent, count, onStartChange):
         self.parent = parent
+        self.count = count
+        self.onStartChangeCallback = onStartChange
 
         
         self.tray_selection = tk.StringVar(value = "BLUE")
@@ -103,6 +124,7 @@ class SFE_WellPicker(tk.Frame):
         self.start_label.pack()
 
         self.combo = ttk.Combobox(self, textvariable=self.start_position, values=self.pos_choices, state='readonly', width=10)
+        self.combo.bind('<<ComboboxSelected>>', self.onStartChange)
         self.combo.pack()   
 
         self.pool_label = tk.Label(self, text="Pool Well")
@@ -110,6 +132,8 @@ class SFE_WellPicker(tk.Frame):
 
         self.pool_combo = ttk.Combobox(self, textvariable=self.pool_position, values=self.pos_choices, state='readonly', width=10)   
         self.pool_combo.pack()
+
+        # self.rebuildSelections()
 
          
         return
@@ -136,15 +160,27 @@ class SFE_ListText(tk.Text):
     def __init__(self, parent, sample_list):
 
         self.parent = parent
+        self.sample_list = sample_list
         self.scrollbar = tk.Scrollbar(self.parent)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        # tk.Text.__init__(self, self.parent, height=40, width=100, yscrollcommand=self.scrollbar.set)  
         tk.Text.__init__(self, self.parent, yscrollcommand=self.scrollbar.set)  
         self.scrollbar.config(command=self.yview)
         
-        for i in range(sample_list.getSampleCount()):
-            self.insert(tk.END, "{:>3}| {:>5}| {:>24}| {:>24}\n".format(i, sample_list.getData('sample number', i), sample_list.getData('sample name', i), sample_list.getData('method', i)))
+        self.buildListText()
         
+
+        return
+    
+    def buildListText(self):
+        self.config(state = 'normal')
+        self.delete(1.0, tk.END)
+        for i in range(self.sample_list.getSampleCount()):
+            self.insert(tk.END, 
+                        "{:>3}| {:>5}| {:>24} | {:<4} | {:>24} |\n".format(i, 
+                                                                   self.sample_list.getData('number', i), 
+                                                                   self.sample_list.getData('name', i), 
+                                                                   self.sample_list.getData('position', i),
+                                                                   self.sample_list.getData('method', i)))
         self.config(state = 'disabled')
 
         return
@@ -174,8 +210,8 @@ class SFE_ListFrame(tk.Frame):
         self.parent = parent    
         tk.Frame.__init__(self, self.parent)
 
-        sfe_list_text = SFE_ListText(self, sample_list)
-        sfe_list_text.pack(fill=tk.BOTH,expand=True)
+        self.sfe_list_text = SFE_ListText(self, sample_list)
+        self.sfe_list_text.pack(fill=tk.BOTH,expand=True)
         # sfe_list_text.insert(tk.END, "Text Here")
 
         return
@@ -196,16 +232,10 @@ class SequenceFrontEnd:
     def __init__(self, parent):
 
         self.parent = parent
-        self.sample_list = SampleList()
+        self.sample_list = SampleList(self)
         self.gpf = tk.IntVar(value=0)
 
         self.buildUI()
-        return
-    
-    def buildSequence(self):
-
-        
-
         return
     
 
@@ -229,7 +259,7 @@ class SequenceFrontEnd:
         self.list_frame = SFE_ListFrame(self.left_frame, self.sample_list)
         self.list_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
-        self.start_well_picker = SFE_WellPicker(self.right_frame)
+        self.start_well_picker = SFE_WellPicker(self.right_frame, self.sample_list.getSampleCount(), self.rebuild)
         self.start_well_picker.pack()
 
         self.gpf_check = tk.Checkbutton(self.right_frame, text="Include GPF", variable=self.gpf, 
@@ -242,7 +272,20 @@ class SequenceFrontEnd:
         self.exit_button = tk.Button(self.bottom_frame, text = "Exit", command = self.parent.destroy)
         self.exit_button.pack()
 
+        self.rebuild()
+
         return
+    
+    def rebuild(self, event=None):
+        self.sample_list.reBuildList()
+        self.list_frame.sfe_list_text.buildListText()
+
+        return
+
+    def getSamplePositions(self):
+        return self.start_well_picker.getSamplePosistions()
+    
+
 
 
 
