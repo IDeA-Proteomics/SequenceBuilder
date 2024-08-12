@@ -155,7 +155,49 @@ class SFE_Head(tk.Frame):
         self.proj_label.pack(side=tk.TOP, anchor=tk.W)
 
         return
+
+class SFE_SequenceText(tk.Text):
+
+    def __init__(self, parent, sample_list):
+
+        self.parent = parent
+        self.sample_list = sample_list
+        self.y_scrollbar = tk.Scrollbar(self.parent)
+        self.y_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.x_scrollbar = tk.Scrollbar(self.parent, orient=tk.HORIZONTAL)
+        self.x_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+        tk.Text.__init__(self, self.parent, yscrollcommand = self.y_scrollbar.set, xscrollcommand = self.x_scrollbar.set, wrap='none')
+        self.y_scrollbar.config(command = self.yview)
+        self.x_scrollbar.config(command = self.xview)
+
+        self.buildSequenceText()
+
+        return
     
+    def buildSequenceText(self):
+
+        self.config(state = 'normal')
+        self.delete(1.0, tk.END)
+        for i in range(self.sample_list.getSequenceCount()):
+            self.insert(tk.END, 
+                        "{:>3}| {:>8}| {:>40.40}| {:>4} | {:<40.40} | {:<40.40} | {:<5} | {:<5} | {:>20.20} |\n".format(i,
+                                                                   self.sample_list.getSequenceData('Sample Type', i),
+                                                                   self.sample_list.getSequenceData('File Name', i),
+                                                                   self.sample_list.getSequenceData('Sample ID', i),  
+                                                                   self.sample_list.getSequenceData('Path', i),
+                                                                   self.sample_list.getSequenceData('Instrument Method', i),
+                                                                   self.sample_list.getSequenceData('Position', i),
+                                                                   self.sample_list.getSequenceData('Inj Vol', i),
+                                                                   self.sample_list.getSequenceData('Sample Name', i),
+                                                                   )
+                                                                   )
+        self.config(state = 'disabled')
+
+
+        return
+    
+
+
 class SFE_ListText(tk.Text):
 
     def __init__(self, parent, sample_list):
@@ -178,10 +220,10 @@ class SFE_ListText(tk.Text):
         for i in range(self.sample_list.getSampleCount()):
             self.insert(tk.END, 
                         "{:>3}| {:>5}| {:>24} | {:<4} | {:>24} |\n".format(i, 
-                                                                   self.sample_list.getData('number', i), 
-                                                                   self.sample_list.getData('name', i), 
-                                                                   self.sample_list.getData('position', i),
-                                                                   self.sample_list.getData('method', i)))
+                                                                   self.sample_list.getListData('number', i), 
+                                                                   self.sample_list.getListData('name', i), 
+                                                                   self.sample_list.getListData('position', i),
+                                                                   self.sample_list.getListData('method', i)))
         self.config(state = 'disabled')
 
         return
@@ -214,10 +256,20 @@ class SFE_ListFrame(tk.Frame):
         self.parent = parent    
         tk.Frame.__init__(self, self.parent)
 
-        self.sfe_list_text = SFE_ListText(self, sample_list)
-        self.sfe_list_text.pack(fill=tk.BOTH,expand=True)
-        # sfe_list_text.insert(tk.END, "Text Here")
+        self.tabs = ttk.Notebook(self)
+        self.plate_tab = tk.Frame(self.tabs)
+        self.sequence_tab = tk.Frame(self.tabs)
 
+        self.tabs.add(self.plate_tab, text = "Plate")
+        self.tabs.add(self.sequence_tab, text = "Sequence")
+
+        self.tabs.pack(fill = tk.BOTH, expand=True)
+
+        self.sfe_list_text = SFE_ListText(self.plate_tab, sample_list)
+        self.sfe_list_text.pack(fill=tk.BOTH,expand=True)
+
+        self.sfe_sequence_text = SFE_SequenceText(self.sequence_tab, sample_list)
+        self.sfe_sequence_text.pack(fill=tk.BOTH,expand=True)
         return
     
     
@@ -274,7 +326,7 @@ class SequenceFrontEnd:
         self.method_chooser.pack()
 
         self.exit_button = tk.Button(self.bottom_frame, text = "Exit", command = self.parent.destroy)
-        self.create_button = tk.Button(self.bottom_frame, text="Create", command=self.sample_list.buildSequence)
+        self.create_button = tk.Button(self.bottom_frame, text="Create", command=self.sample_list.reBuildSequence)
         self.exit_button.pack(side=tk.LEFT)
         self.create_button.pack()
 
@@ -285,6 +337,8 @@ class SequenceFrontEnd:
     def rebuild(self, event=None):
         self.sample_list.reBuildList()
         self.list_frame.sfe_list_text.buildListText()
+        self.sample_list.reBuildSequence()
+        self.list_frame.sfe_sequence_text.buildSequenceText()
 
         return
 

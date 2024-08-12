@@ -46,15 +46,17 @@ class SampleList():
 
         return
     
-    def buildSequence(self):
-
+    def reBuildSequence(self):
+        self.sequence['Sample Type'] = "Unknown"
         self.sequence['File Name'] = self.project_name + '/' + self.list['name']
         self.sequence['Sample ID'] = self.list['number']
         self.sequence['Path'] = "C:/Data/" + self.project_name 
         self.sequence['Instrument Method'] = self.getMethod()
+        self.sequence['Position'] = self.list['position']
+        self.sequence['Inj Vol'] = "10.0"
 
         self.sequence['Sample Name'] = self.list['name']
-        print(self.sequence)
+        # print(self.sequence)
 
         return
     
@@ -70,8 +72,14 @@ class SampleList():
     def getSampleCount(self):
         return len(self.data)
     
-    def getData(self, data, index):
+    def getSequenceCount(self):
+        return len(self.sequence)
+
+    def getListData(self, data, index):
         return self.list[data][index]
+     
+    def getSequenceData(self, data, index):
+        return self.sequence[data][index]
     
     def getSampleName(self, index):
         if index < self.getSampleCount():
