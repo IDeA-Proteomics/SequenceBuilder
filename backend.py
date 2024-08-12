@@ -1,6 +1,7 @@
 import pandas as pd
 import openpyxl
 import os
+import re
 
 import frontend
 
@@ -12,7 +13,13 @@ class SampleList():
         self.path = filename
 
         self.abs_path = os.path.abspath(self.path)
-        self.project_name = "BothnerB_022823"
+
+        split_name = self.abs_path.split('\\')[-1]
+        proj_pattern = r'([^/]+_\d{6}.*)(?=_SampleList\.xlsx)'
+        match = re.match(proj_pattern, split_name)
+
+        self.project_name = match.group(1) if match else "Bad Name"
+        
 
         self.data = pd.read_excel(self.abs_path, engine='openpyxl')
         self.list = pd.DataFrame(data=self.data[['sample number', 'sample name']].values, columns=['number', 'name'])
