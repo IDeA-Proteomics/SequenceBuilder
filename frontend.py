@@ -62,9 +62,10 @@ class SFE_WellPicker(tk.Frame):
         
         self.pool_position.set(self.tray_selection.get()[:1] + self.pool_position.get()[1:])
         self.rebuildSelections()
+        self.onStartChangeCallback()
         return
     
-    def rebuildSelections(self, event=None):
+    def rebuildSelections(self):
         self.pos_choices = self.getPositionList()
         self.combo_vals = self.pos_choices[:97-self.count]
         self.combo.config(values = self.combo_vals)
@@ -202,6 +203,9 @@ class SFE_MethodChooser(tk.Frame):
 
         return
     
+    def getMethod(self):
+        return self.combo.get()
+    
 
 class SFE_ListFrame(tk.Frame):
 
@@ -270,7 +274,9 @@ class SequenceFrontEnd:
         self.method_chooser.pack()
 
         self.exit_button = tk.Button(self.bottom_frame, text = "Exit", command = self.parent.destroy)
-        self.exit_button.pack()
+        self.create_button = tk.Button(self.bottom_frame, text="Create", command=self.sample_list.buildSequence)
+        self.exit_button.pack(side=tk.LEFT)
+        self.create_button.pack()
 
         self.rebuild()
 
@@ -284,6 +290,9 @@ class SequenceFrontEnd:
 
     def getSamplePositions(self):
         return self.start_well_picker.getSamplePosistions()
+    
+    def getMethod(self):
+        return self.method_chooser.getMethod()
     
 
 
