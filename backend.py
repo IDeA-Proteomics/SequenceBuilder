@@ -6,13 +6,15 @@ import frontend
 
 class SampleList():
 
-    def __init__(self, front):
+    def __init__(self, front, filename):
         self.front = front
-        self.path = "~/Automate/BothnerB_022823_SampleList.xlsx"
+        # self.path = "~/Automate/BothnerB_022823_SampleList.xlsx"
+        self.path = filename
+
         self.abs_path = os.path.abspath(self.path)
         self.project_name = "BothnerB_022823"
 
-        self.data = pd.read_excel(self.path, engine='openpyxl')
+        self.data = pd.read_excel(self.abs_path, engine='openpyxl')
         self.list = pd.DataFrame(data=self.data[['sample number', 'sample name']].values, columns=['number', 'name'])
         self.list['method'] = "None"
         self.list['position'] = "NA"

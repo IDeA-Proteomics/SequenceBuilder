@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
 from tkinter import font
 # from IDeA_classes import SampleList
 from backend import *
@@ -288,7 +289,8 @@ class SequenceFrontEnd:
     def __init__(self, parent):
 
         self.parent = parent
-        self.sample_list = SampleList(self)
+        self.file_name = filedialog.askopenfilename()
+        self.sample_list = SampleList(self, self.file_name)
         self.gpf = tk.IntVar(value=0)
 
         self.buildUI()
