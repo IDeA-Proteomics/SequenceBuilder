@@ -1,5 +1,6 @@
 import pandas as pd
 import openpyxl
+from openpyxl import load_workbook
 import os
 import re
 
@@ -19,9 +20,26 @@ class SampleList():
         match = re.match(proj_pattern, split_name)
 
         self.project_name = match.group(1) if match else "Bad Name"
-        
 
-        self.data = pd.read_excel(self.abs_path, engine='openpyxl')
+        ####  Examine XLS file.  Find row with headers and last sample (first empty after samples)
+
+        wb = load_workbook(self.abs_path, data_only=True)
+        sh = wb.worksheets[0]
+
+        self.head_row = None
+        self.last_row = None
+        for i in range(1, sh.max_row + 1):
+            if self.head_row == None and sh.cell(row = i, column=1).value == "sample number":
+                self.head_row = i
+            if all([cell.value is None for cell in sh[i]]):
+                if self.head_row != None and i > self.head_row:
+                    self.last_row = i
+                    break
+        if self.last_row == None:
+            self.last_row = sh.max_row + 1
+
+
+        self.data = pd.read_excel(self.abs_path, engine='openpyxl', skiprows=self.head_row - 1, nrows=(self.last_row - self.head_row))
         self.list = pd.DataFrame(data=self.data[['sample number', 'sample name']].values, columns=['number', 'name'])
         self.list['method'] = "None"
         self.list['position'] = "NA"
@@ -57,7 +75,7 @@ class SampleList():
     
     def reBuildSequence(self):
         self.sequence['Sample Type'] = "Unknown"
-        self.sequence['File Name'] = self.project_name + '/' + self.list['name']
+        self.sequence['File Name'] = self.project_name + '/' + str(self.list['name'])
         self.sequence['Sample ID'] = self.list['number']
         self.sequence['Path'] = "C:/Data/" + self.project_name 
         self.sequence['Instrument Method'] = self.getMethod()
@@ -68,6 +86,10 @@ class SampleList():
         # print(self.sequence)
 
         return
+    
+    def outputSequence(self):
+        self.reBuildSequence()
+        self.sequence.to_csv("C:\\Automate\\sequence.csv")
     
     def reBuildList(self):
 

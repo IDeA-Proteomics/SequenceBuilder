@@ -182,14 +182,14 @@ class SFE_SequenceText(tk.Text):
         for i in range(self.sample_list.getSequenceCount()):
             self.insert(tk.END, 
                         "{:>3}| {:>8}| {:>40.40}| {:>4} | {:<40.40} | {:<40.40} | {:<5} | {:<5} | {:>20.20} |\n".format(i,
-                                                                   self.sample_list.getSequenceData('Sample Type', i),
-                                                                   self.sample_list.getSequenceData('File Name', i),
-                                                                   self.sample_list.getSequenceData('Sample ID', i),  
-                                                                   self.sample_list.getSequenceData('Path', i),
-                                                                   self.sample_list.getSequenceData('Instrument Method', i),
-                                                                   self.sample_list.getSequenceData('Position', i),
-                                                                   self.sample_list.getSequenceData('Inj Vol', i),
-                                                                   self.sample_list.getSequenceData('Sample Name', i),
+                                                                   str(self.sample_list.getSequenceData('Sample Type', i)),
+                                                                   str(self.sample_list.getSequenceData('File Name', i)),
+                                                                   str(self.sample_list.getSequenceData('Sample ID', i)),  
+                                                                   str(self.sample_list.getSequenceData('Path', i)),
+                                                                   str(self.sample_list.getSequenceData('Instrument Method', i)),
+                                                                   str(self.sample_list.getSequenceData('Position', i)),
+                                                                   str(self.sample_list.getSequenceData('Inj Vol', i)),
+                                                                   str(self.sample_list.getSequenceData('Sample Name', i)),
                                                                    )
                                                                    )
         self.config(state = 'disabled')
@@ -221,10 +221,10 @@ class SFE_ListText(tk.Text):
         for i in range(self.sample_list.getSampleCount()):
             self.insert(tk.END, 
                         "{:>3}| {:>5}| {:>24} | {:<4} | {:>24} |\n".format(i, 
-                                                                   self.sample_list.getListData('number', i), 
-                                                                   self.sample_list.getListData('name', i), 
-                                                                   self.sample_list.getListData('position', i),
-                                                                   self.sample_list.getListData('method', i)))
+                                                                   str(self.sample_list.getListData('number', i)), 
+                                                                   str(self.sample_list.getListData('name', i)), 
+                                                                   str(self.sample_list.getListData('position', i)),
+                                                                   str(self.sample_list.getListData('method', i))))
         self.config(state = 'disabled')
 
         return
@@ -289,7 +289,7 @@ class SequenceFrontEnd:
     def __init__(self, parent):
 
         self.parent = parent
-        self.file_name = filedialog.askopenfilename()
+        self.file_name = filedialog.askopenfilename(initialdir="Z:\\Active_projects")
         self.sample_list = SampleList(self, self.file_name)
         self.gpf = tk.IntVar(value=0)
 
@@ -328,7 +328,7 @@ class SequenceFrontEnd:
         self.method_chooser.pack()
 
         self.exit_button = tk.Button(self.bottom_frame, text = "Exit", command = self.parent.destroy)
-        self.create_button = tk.Button(self.bottom_frame, text="Create", command=self.sample_list.reBuildSequence)
+        self.create_button = tk.Button(self.bottom_frame, text="Create", command=self.sample_list.outputSequence)
         self.exit_button.pack(side=tk.LEFT)
         self.create_button.pack()
 
