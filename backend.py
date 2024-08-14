@@ -75,7 +75,7 @@ class SampleList():
     
     def reBuildSequence(self):
         self.sequence['Sample Type'] = "Unknown"
-        self.sequence['File Name'] = self.project_name + '/' + str(self.list['name'])
+        self.sequence['File Name'] = [self.project_name + '\\' + str(x) for x in self.list['name']]
         self.sequence['Sample ID'] = self.list['number']
         self.sequence['Path'] = "C:/Data/" + self.project_name 
         self.sequence['Instrument Method'] = self.getMethod()
@@ -89,9 +89,10 @@ class SampleList():
     
     def outputSequence(self):
         self.reBuildSequence()
-        template = "Bracket Type = 4\n{}"
-        with open('C:\\Automate\\sequence.csv', 'wb') as fp:
-            fp.write(template.format(self.sequence.to_csv(index=False)).encode("utf-8"))
+        template = "Bracket Type=4,\n"
+        with open('C:\\Automate\\sequence.csv', 'w') as fp:
+            fp.write(template)
+        self.sequence.to_csv("C:\\Automate\\sequence.csv", index=False, mode='a')
     
     def reBuildList(self):
 
