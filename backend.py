@@ -10,7 +10,6 @@ class SampleList():
 
     def __init__(self, front, filename):
         self.front = front
-        # self.path = "~/Automate/BothnerB_022823_SampleList.xlsx"
         self.path = filename
 
         self.abs_path = os.path.abspath(self.path)
@@ -74,15 +73,19 @@ class SampleList():
         return
     
     def reBuildSequence(self):
+        if self.front.getRandom() == 1:
+            temp_list = self.list.sample(frac=1).reset_index(drop=True)
+        else:
+            temp_list = self.list
         self.sequence['Sample Type'] = "Unknown"
-        self.sequence['File Name'] = [self.project_name + '\\' + str(x) for x in self.list['name']]
-        self.sequence['Sample ID'] = self.list['number']
+        self.sequence['File Name'] = [self.project_name + '/' + str(x) for x in temp_list['name']]
+        self.sequence['Sample ID'] = temp_list['number']
         self.sequence['Path'] = "C:/Data/" + self.project_name 
         self.sequence['Instrument Method'] = self.getMethod()
-        self.sequence['Position'] = self.list['position']
+        self.sequence['Position'] = temp_list['position']
         self.sequence['Inj Vol'] = "10.0"
 
-        self.sequence['Sample Name'] = self.list['name']
+        self.sequence['Sample Name'] = temp_list['name']
         # print(self.sequence)
 
         return
@@ -90,9 +93,10 @@ class SampleList():
     def outputSequence(self):
         self.reBuildSequence()
         template = "Bracket Type=4,\n"
-        with open('C:\\Automate\\sequence.csv', 'w') as fp:
+        fname = "Z:\\David\\{}_Injection_Sequence.csv".format(self.project_name)
+        with open(fname, 'w') as fp:
             fp.write(template)
-        self.sequence.to_csv("C:\\Automate\\sequence.csv", index=False, mode='a')
+        self.sequence.to_csv(fname, index=False, mode='a')
     
     def reBuildList(self):
 

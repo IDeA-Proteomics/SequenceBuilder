@@ -292,6 +292,7 @@ class SequenceFrontEnd:
         self.file_name = filedialog.askopenfilename(initialdir="Z:\\Active_projects")
         self.sample_list = SampleList(self, self.file_name)
         self.gpf = tk.IntVar(value=0)
+        self.random = tk.IntVar(value=0)
 
         self.buildUI()
         return
@@ -324,6 +325,10 @@ class SequenceFrontEnd:
                              onvalue=1, offvalue=0)
         self.gpf_check.pack()
 
+        self.random_check = tk.Checkbutton(self.right_frame, text="Randomize", variable=self.random, 
+                             onvalue=1, offvalue=0, command=self.rebuild)
+        self.random_check.pack()
+
         self.method_chooser = SFE_MethodChooser(self.right_frame)
         self.method_chooser.pack()
 
@@ -349,6 +354,9 @@ class SequenceFrontEnd:
     
     def getMethod(self):
         return self.method_chooser.getMethod()
+    
+    def getRandom(self):
+        return self.random.get()
     
 
 
