@@ -89,7 +89,9 @@ class SampleList():
     
     def outputSequence(self):
         self.reBuildSequence()
-        self.sequence.to_csv("C:\\Automate\\sequence.csv")
+        template = "Bracket Type = 4\n{}"
+        with open('C:\\Automate\\sequence.csv', 'wb') as fp:
+            fp.write(template.format(self.sequence.to_csv(index=False)).encode("utf-8"))
     
     def reBuildList(self):
 
