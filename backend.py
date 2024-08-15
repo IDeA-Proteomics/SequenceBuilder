@@ -80,7 +80,7 @@ class SampleList():
             filename = f'{self.project_name}_GPF6_{i}'
             gpf_method_template = r"C:\Xcalibur\methods\DIA\60min_5ulLoad_10ulLoop\DIA_GPF_{mz_start}_{mz_end}_60min_5ulLoad_10ulLoop_031221"
             meth_name = gpf_method_template.format(mz_start=mz_start, mz_end=mz_end)
-            w.append({'Sample Type':'unknown', 
+            w.append({'Sample Type':'Unknown', 
                       'File Name':filename, 
                       'Sample ID':'GPF_' + str(i), 
                       'Path':"C:/Data/" + self.project_name, 
@@ -97,7 +97,7 @@ class SampleList():
         for i in range(1, 4):
             filename = f'{self.project_name}_Pool_{i}'
             w.append({
-                'Sample Type':'unknown',
+                'Sample Type':'Unknown',
                 'File Name' : filename,
                 'Sample ID':'Pool' + str(i),
                 'Path':"C:/Data/" + self.project_name,
