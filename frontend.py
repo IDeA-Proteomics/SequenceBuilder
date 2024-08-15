@@ -322,7 +322,7 @@ class SequenceFrontEnd:
         self.start_well_picker.pack()
 
         self.gpf_check = tk.Checkbutton(self.right_frame, text="Include GPF", variable=self.gpf, 
-                             onvalue=1, offvalue=0)
+                             onvalue=1, offvalue=0, command=self.rebuild)
         self.gpf_check.pack()
 
         self.random_check = tk.Checkbutton(self.right_frame, text="Randomize", variable=self.random, 
@@ -357,6 +357,9 @@ class SequenceFrontEnd:
     
     def getRandom(self):
         return self.random.get()
+    
+    def getGPF(self):
+        return self.gpf.get()
     
 
 
