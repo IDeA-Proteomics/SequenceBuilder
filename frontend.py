@@ -93,6 +93,9 @@ class SFE_WellPicker(tk.Frame):
         idx = pos_list.index(self.start_position.get())
         
         return pos_list[idx:idx+self.count]
+    
+    def getPoolWell(self):
+        return self.pool_position.get()
 
     def __init__(self, parent, count, onStartChange):
         self.parent = parent
@@ -132,7 +135,8 @@ class SFE_WellPicker(tk.Frame):
         self.pool_label = tk.Label(self, text="Pool Well")
         self.pool_label.pack()
 
-        self.pool_combo = ttk.Combobox(self, textvariable=self.pool_position, values=self.pos_choices, state='readonly', width=10)   
+        self.pool_combo = ttk.Combobox(self, textvariable=self.pool_position, values=self.pos_choices, state='readonly', width=10)  
+        self.pool_combo.bind('<<ComboboxSelected>>', self.onStartChange) 
         self.pool_combo.pack()
 
         # self.rebuildSelections()
@@ -291,6 +295,7 @@ class SequenceFrontEnd:
         self.parent = parent
         self.file_name = filedialog.askopenfilename(initialdir="Z:\\Active_projects")
         self.sample_list = SampleList(self, self.file_name)
+        self.pool = tk.IntVar(value=0)
         self.gpf = tk.IntVar(value=0)
         self.random = tk.IntVar(value=0)
 
@@ -320,6 +325,10 @@ class SequenceFrontEnd:
 
         self.start_well_picker = SFE_WellPicker(self.right_frame, self.sample_list.getSampleCount(), self.rebuild)
         self.start_well_picker.pack()
+
+        self.pool_check = tk.Checkbutton(self.right_frame, text="Include Pool", variable=self.pool,
+                                         onvalue=1, offvalue=0, command=self.rebuild)
+        self.pool_check.pack()
 
         self.gpf_check = tk.Checkbutton(self.right_frame, text="Include GPF", variable=self.gpf, 
                              onvalue=1, offvalue=0, command=self.rebuild)
@@ -352,6 +361,9 @@ class SequenceFrontEnd:
     def getSamplePositions(self):
         return self.start_well_picker.getSamplePosistions()
     
+    def getPoolWell(self):
+        return self.start_well_picker.getPoolWell()
+    
     def getMethod(self):
         return self.method_chooser.getMethod()
     
@@ -360,6 +372,9 @@ class SequenceFrontEnd:
     
     def getGPF(self):
         return self.gpf.get()
+    
+    def getPool(self):
+        return self.pool.get()
     
 
 

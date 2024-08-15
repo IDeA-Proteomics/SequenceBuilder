@@ -72,34 +72,7 @@ class SampleList():
 
         return
     
-    def buildGPF(self):
-        gpf_seq = pd.DataFrame(
-            columns=[
-                'Sample Type' , 
-                'File Name' , 
-                'Sample ID' , 
-                'Path' , 
-                'Instrument Method' , 
-                'Process Method' , 
-                'Calibration File' , 
-                'Position' , 
-                'Inj Vol' , 
-                'Level' , 
-                'Sample Wt' , 
-                'Sample Vol' , 
-                'ISTD Amt' , 
-                'Dil Factor' , 
-                'L1 Study' , 
-                'L2 Client' , 
-                'L3 Laboratory' , 
-                'L4 Company' , 
-                'L5 Phone' , 
-                'Comment' , 
-                'Sample Name'
-                ],
-                index=(range(6))
-            )
-        
+    def buildGPF(self):        
         w = []
         for i in range(1,7):
             mz_start = 300 + (100*i)
@@ -112,12 +85,30 @@ class SampleList():
                       'Sample ID':'GPF_' + str(i), 
                       'Path':"C:/Data/" + self.project_name, 
                       'Instrument Method':meth_name,
+                      'Position': self.getPoolWell(),
                       'Inj Vol':'10.0',
                       'Sample Name':"GPF_" + str(i)
                       })
         df = pd.DataFrame.from_records(w,index=range(6))
         return df
     
+    def buildPool(self):
+        w = []
+        for i in range(1, 4):
+            filename = f'{self.project_name}_Pool_{i}'
+            w.append({
+                'Sample Type':'unknown',
+                'File Name' : filename,
+                'Sample ID':'Pool' + str(i),
+                'Path':"C:/Data/" + self.project_name,
+                'Instrument Method': self.getMethod(),
+                'Position': self.getPoolWell(),
+                'Inj Vol':'10.0',
+                'Sample Name':"Pool_" + str(i)
+            })
+        df = pd.DataFrame.from_records(w, index=range(3))
+        return df
+
     def reBuildSequence(self):
         self.sequence = pd.DataFrame(
             columns=[
@@ -157,12 +148,23 @@ class SampleList():
         self.sequence['Position'] = temp_list['position']
         self.sequence['Inj Vol'] = "10.0"
 
-        self.sequence['Sample Name'] = temp_list['name']
+        self.sequence['Sample Name'] = temp_list['name']   
 
-        halfway = int(len(self.sequence)/2)
+        if self.front.getPool() == 1:
+            oneThird = int(len(self.sequence)/3)
+            pools = self.buildPool()
+            self.sequence = pd.concat([
+                self.sequence.iloc[:oneThird], pools.iloc[:1],
+                self.sequence.iloc[oneThird:oneThird*2], pools.iloc[1:2],
+                self.sequence.iloc[oneThird*2:], pools.iloc[2:]
+            ]).reset_index(drop=True)
+                 
         
         if self.front.getGPF() == 1:
+            halfway = int(len(self.sequence)/2)
             self.sequence = pd.concat([self.sequence.iloc[:halfway], self.buildGPF(), self.sequence.iloc[halfway:]]).reset_index(drop=True)
+
+        
 
 
 
@@ -189,6 +191,9 @@ class SampleList():
     
     def getMethod(self):
         return self.front.getMethod()
+    
+    def getPoolWell(self):
+        return self.front.getPoolWell()
     
     def getSampleCount(self):
         return len(self.data)
