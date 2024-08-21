@@ -5,6 +5,7 @@ import os
 import re
 
 import frontend
+import datamodel
 
 class SampleList():
 
@@ -28,8 +29,11 @@ class SampleList():
         self.head_row = None
         self.last_row = None
         for i in range(1, sh.max_row + 1):
-            if self.head_row == None and sh.cell(row = i, column=1).value == "sample number":
-                self.head_row = i
+            if self.head_row == None:
+                for j in range (1, sh.max_column + 1):
+                    if sh.cell(row = i, column=j).value == "sample number":
+                        self.head_row = i
+                        break
             if all([cell.value is None for cell in sh[i]]):
                 if self.head_row != None and i > self.head_row:
                     self.last_row = i
@@ -78,12 +82,12 @@ class SampleList():
             mz_start = 300 + (100*i)
             mz_end = 300 + (100*i)
             filename = f'{self.project_name}_GPF6_{i}'
-            gpf_method_template = r"C:\Xcalibur\methods\DIA\60min_5ulLoad_10ulLoop\DIA_GPF_{mz_start}_{mz_end}_60min_5ulLoad_10ulLoop_031221"
+            gpf_method_template = r"C:\\Xcalibur\\methods\\DIA\\60min_5ulLoad_10ulLoop\\DIA_GPF_{mz_start}_{mz_end}_60min_5ulLoad_10ulLoop_031221"
             meth_name = gpf_method_template.format(mz_start=mz_start, mz_end=mz_end)
             w.append({'Sample Type':'Unknown', 
                       'File Name':filename, 
                       'Sample ID':'GPF_' + str(i), 
-                      'Path':"C:/Data/" + self.project_name, 
+                      'Path':"D:\\" + self.project_name, 
                       'Instrument Method':meth_name,
                       'Position': self.getPoolWell(),
                       'Inj Vol':'10.0',
@@ -100,7 +104,7 @@ class SampleList():
                 'Sample Type':'Unknown',
                 'File Name' : filename,
                 'Sample ID':'Pool' + str(i),
-                'Path':"C:/Data/" + self.project_name,
+                'Path':"D:\\" + self.project_name,
                 'Instrument Method': self.getMethod(),
                 'Position': self.getPoolWell(),
                 'Inj Vol':'10.0',
@@ -108,6 +112,40 @@ class SampleList():
             })
         df = pd.DataFrame.from_records(w, index=range(3))
         return df
+    
+    def buildBlankQC(self, whichOne):
+        blank = {
+                'Sample Type':'Unknown',
+                'File Name' : "Blank",
+                'Sample ID':"Blank",
+                'Path':"D:\\" + self.project_name,
+                'Instrument Method': self.getMethod(),
+                'Position': "G1",
+                'Inj Vol':'10.0',
+                'Sample Name':"Blank"
+        }
+        rinse = {
+                'Sample Type':'Unknown',
+                'File Name' : "Rinse",
+                'Sample ID':"Rinse",
+                'Path':"D:\\" + self.project_name,
+                'Instrument Method': datamodel.rinse_methods[self.getInstrument()],
+                'Position': "G1",
+                'Inj Vol':'10.0',
+                'Sample Name':"Rinse"
+        }
+        qc = {
+                'Sample Type':'Unknown',
+                'File Name' : "QC_X1_JJN3_iRT_" + ("pre_" if whichOne == "pre" else "post_") + self.project_name + "_DDA",
+                'Sample ID':"QC",
+                'Path':"D:\\QC",
+                'Instrument Method': datamodel.qc_methods[self.getInstrument()],
+                'Position': "RA1",
+                'Inj Vol':'10.0',
+                'Sample Name':"QC_PRE"
+        }
+
+        return pd.DataFrame.from_records([rinse, blank, qc, rinse, blank], index=range(5))
 
     def reBuildSequence(self):
         self.sequence = pd.DataFrame(
@@ -141,9 +179,9 @@ class SampleList():
         else:
             temp_list = self.list
         self.sequence['Sample Type'] = "Unknown"
-        self.sequence['File Name'] = [self.project_name + '/' + str(x) for x in temp_list['name']]
+        self.sequence['File Name'] = [self.project_name + '_' + str(x) for x in temp_list['name']]
         self.sequence['Sample ID'] = temp_list['number']
-        self.sequence['Path'] = "C:/Data/" + self.project_name 
+        self.sequence['Path'] = "D:\\" + self.project_name 
         self.sequence['Instrument Method'] = self.getMethod()
         self.sequence['Position'] = temp_list['position']
         self.sequence['Inj Vol'] = "10.0"
@@ -164,9 +202,8 @@ class SampleList():
             halfway = int(len(self.sequence)/2)
             self.sequence = pd.concat([self.sequence.iloc[:halfway], self.buildGPF(), self.sequence.iloc[halfway:]]).reset_index(drop=True)
 
-        
-
-
+        if self.front.getAddQC() == 1:
+            self.sequence = pd.concat([self.buildBlankQC("pre"), self.sequence, self.buildBlankQC("post")]).reset_index(drop=True)
 
         return
     
@@ -191,6 +228,9 @@ class SampleList():
     
     def getMethod(self):
         return self.front.getMethod()
+    
+    def getInstrument(self):
+        return self.front.getInstrument()
     
     def getPoolWell(self):
         return self.front.getPoolWell()

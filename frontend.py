@@ -5,6 +5,7 @@ from tkinter import font
 # from IDeA_classes import SampleList
 from backend import *
 import re
+import datamodel
 
 ### 1 = RED
 ### 2 - GREEN
@@ -103,7 +104,7 @@ class SFE_WellPicker(tk.Frame):
         self.onStartChangeCallback = onStartChange
 
         
-        self.tray_selection = tk.StringVar(value = "BLUE")
+        self.tray_selection = tk.StringVar(value = "GREEN")
         self.start_position = tk.StringVar(value = "BA1")
         self.pool_position = tk.StringVar(value = "BH12")
         self.pos_choices = self.getPositionList()
@@ -138,9 +139,6 @@ class SFE_WellPicker(tk.Frame):
         self.pool_combo = ttk.Combobox(self, textvariable=self.pool_position, values=self.pos_choices, state='readonly', width=10)  
         self.pool_combo.bind('<<ComboboxSelected>>', self.onStartChange) 
         self.pool_combo.pack()
-
-        # self.rebuildSelections()
-
          
         return
     
@@ -245,7 +243,7 @@ class SFE_MethodChooser(tk.Frame):
 
         tk.Frame.__init__(self, self.parent)
 
-        self.combo = ttk.Combobox(self, textvariable=self.method_choice, values=self.methods, state='readonly', width=20)
+        self.combo = ttk.Combobox(self, textvariable=self.method_choice, values=self.methods, state='readonly', width=100)
         self.combo.pack(side = tk.LEFT, anchor=tk.W)
 
         return
@@ -298,6 +296,8 @@ class SequenceFrontEnd:
         self.pool = tk.IntVar(value=0)
         self.gpf = tk.IntVar(value=0)
         self.random = tk.IntVar(value=0)
+        self.addqc = tk.IntVar(value=0)
+        self.instrument = tk.StringVar(value="Exploris2")
 
         self.buildUI()
         return
@@ -307,21 +307,32 @@ class SequenceFrontEnd:
     def buildUI(self):
 
         self.main_frame = tk.Frame(self.parent, **frame_options)
-        self.left_frame = tk.Frame(self.main_frame, **frame_options)
-        self.right_frame = tk.Frame(self.main_frame, **frame_options)
+        self.top_frame = tk.Frame(self.main_frame, **frame_options)
+        self.body_frame = tk.Frame(self.main_frame, **frame_options)
+        self.left_frame = tk.Frame(self.body_frame, **frame_options)
+        self.right_frame = tk.Frame(self.body_frame, **frame_options)
         self.bottom_frame = tk.Frame(self.parent, **frame_options)
 
         self.main_frame.pack(side = tk.TOP, fill=tk.BOTH, expand=True)
+        self.top_frame.pack(side = tk.TOP, fill=tk.X, anchor = tk.W)
+        self.body_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         self.left_frame.pack(side = tk.LEFT, anchor=tk.W, fill=tk.BOTH, expand=True)
         self.right_frame.pack(side = tk.RIGHT, anchor=tk.E)
         self.bottom_frame.pack(side = tk.TOP)
 
 
-        self.head = SFE_Head(self.left_frame, self.sample_list)
-        self.head.pack(side = tk.TOP, anchor=tk.W)
+        self.head = SFE_Head(self.top_frame, self.sample_list)
+        self.head.pack(side = tk.LEFT, anchor=tk.W)
+        
+        self.instrument_frame = tk.Frame(self.top_frame, **frame_options)
+        self.instrument_frame.pack(side = tk.RIGHT, anchor=tk.E)
 
         self.list_frame = SFE_ListFrame(self.left_frame, self.sample_list)
         self.list_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
+
+        self.instrument_combo = ttk.Combobox(self.instrument_frame, textvariable=self.instrument, values=list(datamodel.methods.keys()), state='readonly', width=20)
+        
+        self.instrument_combo.pack()
 
         self.start_well_picker = SFE_WellPicker(self.right_frame, self.sample_list.getSampleCount(), self.rebuild)
         self.start_well_picker.pack()
@@ -338,7 +349,11 @@ class SequenceFrontEnd:
                              onvalue=1, offvalue=0, command=self.rebuild)
         self.random_check.pack()
 
-        self.method_chooser = SFE_MethodChooser(self.right_frame)
+        self.addqc_check = tk.Checkbutton(self.right_frame, text="Add QC", variable=self.addqc, 
+                             onvalue=1, offvalue=0, command=self.rebuild)
+        self.addqc_check.pack()
+
+        self.method_chooser = SFE_MethodChooser(self.instrument_frame)
         self.method_chooser.pack()
 
         self.exit_button = tk.Button(self.bottom_frame, text = "Exit", command = self.parent.destroy)
@@ -346,8 +361,16 @@ class SequenceFrontEnd:
         self.exit_button.pack(side=tk.LEFT)
         self.create_button.pack()
 
+        self.instrument_combo.bind('<<ComboboxSelected>>', self.onInstrumentChoice)
+        self.onInstrumentChoice()
         self.rebuild()
 
+        return
+    
+    def onInstrumentChoice(self, event=None):
+        self.method_chooser.combo.config(values = datamodel.methods[self.instrument.get()])
+        self.method_chooser.combo.current(0)
+        self.rebuild()
         return
     
     def rebuild(self, event=None):
@@ -375,6 +398,12 @@ class SequenceFrontEnd:
     
     def getPool(self):
         return self.pool.get()
+    
+    def getAddQC(self):
+        return self.addqc.get()
+    
+    def getInstrument(self):
+        return self.instrument.get()
     
 
 
