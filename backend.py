@@ -9,6 +9,13 @@ import datamodel
 
 class SampleList():
 
+    def sanitizeName(self, name):
+        newName = re.sub(r"[ +\[\]]+", '_', str(name))
+        if newName[0].isdigit():
+            newName = 'S' + newName
+        return newName
+
+
     def __init__(self, front, filename):
         self.front = front
         self.path = filename
@@ -46,6 +53,13 @@ class SampleList():
         self.list = pd.DataFrame(data=self.data[['sample number', 'sample name']].values, columns=['number', 'name'])
         self.list['method'] = "None"
         self.list['position'] = "NA"
+        self.list['name'] = self.list['name'].apply(self.sanitizeName)
+
+        for i in self.list.index:
+            name = self.list.loc[i, 'name']
+            name = name + "_sample_{:02d}".format(self.list.loc[i, 'number'])
+            self.list.at[i, 'name'] = name
+
 
         self.sequence = pd.DataFrame(
             columns=[

@@ -317,7 +317,7 @@ class SequenceFrontEnd:
         self.top_frame.pack(side = tk.TOP, fill=tk.X, anchor = tk.W)
         self.body_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         self.left_frame.pack(side = tk.LEFT, anchor=tk.W, fill=tk.BOTH, expand=True)
-        self.right_frame.pack(side = tk.RIGHT, anchor=tk.E)
+        self.right_frame.pack(side = tk.RIGHT, anchor=tk.N)
         self.bottom_frame.pack(side = tk.TOP)
 
 
