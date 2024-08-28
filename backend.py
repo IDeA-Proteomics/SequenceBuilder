@@ -3,6 +3,7 @@ import openpyxl
 from openpyxl import load_workbook
 import os
 import re
+import json
 
 import frontend
 import datamodel
@@ -17,6 +18,8 @@ class SampleList():
 
 
     def __init__(self, front, filename):
+        with open("instrument_data.json") as jf:
+            datamodel.instrument_data = json.load(jf)
         self.front = front
         self.path = filename
 

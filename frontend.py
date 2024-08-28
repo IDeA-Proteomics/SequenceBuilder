@@ -1,11 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-from tkinter import font
 # from IDeA_classes import SampleList
 from backend import *
-import re
 import datamodel
+import json
 
 ### 1 = RED
 ### 2 - GREEN
@@ -364,7 +363,7 @@ class SequenceFrontEnd:
         self.method_chooser = SFE_MethodChooser(self.instrument_frame)
         self.method_chooser.pack()
 
-        self.exit_button = tk.Button(self.bottom_frame, text = "Exit", command = self.parent.destroy)
+        self.exit_button = tk.Button(self.bottom_frame, text = "Exit", command = self.onExit)
         self.create_button = tk.Button(self.bottom_frame, text="Create", command=self.sample_list.outputSequence)
         self.exit_button.pack(side=tk.LEFT)
         self.create_button.pack()
@@ -374,6 +373,12 @@ class SequenceFrontEnd:
         self.rebuild()
 
         return
+    
+    def onExit(self):
+        self.parent.destroy()
+        with open("instrument_data.json", 'w') as jf:
+            json.dump(datamodel.instrument_data, jf, ensure_ascii=False, indent=4 )
+
     
     def onInstrumentChoice(self, event=None):
         # self.method_chooser.combo.config(values = datamodel.methods[self.instrument.get()])
