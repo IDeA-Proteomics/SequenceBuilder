@@ -10,7 +10,7 @@ import datamodel
 class SampleList():
 
     def sanitizeName(self, name):
-        newName = re.sub(r"[ +\[\]]+", '_', str(name))
+        newName = re.sub(r"[ +\[\].]+", '_', str(name))
         if newName[0].isdigit():
             newName = 'S' + newName
         return newName
@@ -57,7 +57,10 @@ class SampleList():
 
         for i in self.list.index:
             name = self.list.loc[i, 'name']
-            name = name + "_sample_{:02d}".format(self.list.loc[i, 'number'])
+            if type(self.list.loc[i, 'number']) == int:
+                name = name + "_sample_{:02d}".format(self.list.loc[i, 'number'])
+            else:
+                name = name + "_sample_{}".format(self.list.loc[i, 'number'])
             self.list.at[i, 'name'] = name
 
 
@@ -104,7 +107,7 @@ class SampleList():
                       'Path':"D:\\" + self.project_name, 
                       'Instrument Method':meth_name,
                       'Position': self.getPoolWell(),
-                      'Inj Vol':'10.0',
+                      'Inj Vol': str(datamodel.instrument_data[self.getInstrument()]['loop_vol']),
                       'Sample Name':"GPF_" + str(i)
                       })
         df = pd.DataFrame.from_records(w,index=range(6))
@@ -121,7 +124,7 @@ class SampleList():
                 'Path':"D:\\" + self.project_name,
                 'Instrument Method': self.getMethod(),
                 'Position': self.getPoolWell(),
-                'Inj Vol':'10.0',
+                'Inj Vol': str(datamodel.instrument_data[self.getInstrument()]['loop_vol']),
                 'Sample Name':"Pool_" + str(i)
             })
         df = pd.DataFrame.from_records(w, index=range(3))
@@ -133,9 +136,9 @@ class SampleList():
                 'File Name' : "Blank",
                 'Sample ID':"Blank",
                 'Path':"D:\\" + self.project_name,
-                'Instrument Method': self.getMethod(),
+                'Instrument Method': datamodel.instrument_data[self.getInstrument()]['methods']['blank'],
                 'Position': "G1",
-                'Inj Vol':'10.0',
+                'Inj Vol': str(datamodel.instrument_data[self.getInstrument()]['loop_vol']),
                 'Sample Name':"Blank"
         }
         rinse = {
@@ -143,23 +146,39 @@ class SampleList():
                 'File Name' : "Rinse",
                 'Sample ID':"Rinse",
                 'Path':"D:\\" + self.project_name,
-                'Instrument Method': datamodel.rinse_methods[self.getInstrument()],
+                'Instrument Method': datamodel.instrument_data[self.getInstrument()]['methods']['rinse'],
                 'Position': "G1",
-                'Inj Vol':'10.0',
+                'Inj Vol': str(datamodel.instrument_data[self.getInstrument()]['loop_vol']),
                 'Sample Name':"Rinse"
         }
         qc = {
                 'Sample Type':'Unknown',
-                'File Name' : "QC_X1_JJN3_iRT_" + ("pre_" if whichOne == "pre" else "post_") + self.project_name + "_DDA",
+                'File Name' : "QC_"+ datamodel.instrument_data[self.getInstrument()]['name'] +"_JJN3_iRT_" + ("pre_" if whichOne == "pre" else "post_") + self.project_name + "_DDA",
                 'Sample ID':"QC",
                 'Path':"D:\\QC",
-                'Instrument Method': datamodel.qc_methods[self.getInstrument()],
+                'Instrument Method': datamodel.instrument_data[self.getInstrument()]['methods']['QC'],
                 'Position': "RA1",
-                'Inj Vol':'10.0',
-                'Sample Name':"QC_PRE"
+                'Inj Vol': str(datamodel.instrument_data[self.getInstrument()]['loop_vol']),
+                'Sample Name':"QC_" + ("PRE" if whichOne == "pre" else "POST")
+        }
+        end = {
+                'Sample Type':'Unknown',
+                'File Name' : "End",
+                'Sample ID':"End",
+                'Path': "D:\\" + self.project_name,
+                'Instrument Method': datamodel.instrument_data[self.getInstrument()]['methods']['end'],
+                'Position': "G1",
+                'Inj Vol': str(datamodel.instrument_data[self.getInstrument()]['loop_vol']),
+                'Sample Name':"End"
         }
 
-        return pd.DataFrame.from_records([rinse, blank, qc, rinse, blank], index=range(5))
+        count = 5
+        qc_list = [rinse, blank, qc, rinse, blank]
+        if whichOne != "pre":
+            qc_list.append(end)
+            count = 6
+
+        return pd.DataFrame.from_records(qc_list, index=range(count))
 
     def reBuildSequence(self):
         self.sequence = pd.DataFrame(
@@ -198,7 +217,7 @@ class SampleList():
         self.sequence['Path'] = "D:\\" + self.project_name 
         self.sequence['Instrument Method'] = self.getMethod()
         self.sequence['Position'] = temp_list['position']
-        self.sequence['Inj Vol'] = "10.0"
+        self.sequence['Inj Vol'] = str(datamodel.instrument_data[self.getInstrument()]['loop_vol'])
 
         self.sequence['Sample Name'] = temp_list['name']   
 

@@ -105,8 +105,8 @@ class SFE_WellPicker(tk.Frame):
 
         
         self.tray_selection = tk.StringVar(value = "GREEN")
-        self.start_position = tk.StringVar(value = "BA1")
-        self.pool_position = tk.StringVar(value = "BH12")
+        self.start_position = tk.StringVar(value = "GA1")
+        self.pool_position = tk.StringVar(value = "GH12")
         self.pos_choices = self.getPositionList()
 
         tk.Frame.__init__(self, self.parent)
@@ -124,7 +124,7 @@ class SFE_WellPicker(tk.Frame):
         self.red_button.pack(side = tk.LEFT)
         self.green_button.pack(side = tk.LEFT)
         self.blue_button.pack(side = tk.LEFT)
-        self.blue_button.select()
+        self.green_button.select()
 
         self.start_label = tk.Label(self, text="Start Well")
         self.start_label.pack()
@@ -298,6 +298,7 @@ class SequenceFrontEnd:
         self.random = tk.IntVar(value=0)
         self.addqc = tk.IntVar(value=0)
         self.instrument = tk.StringVar(value="Exploris2")
+        self.diadda_selection = tk.StringVar(value="DDA")
 
         self.buildUI()
         return
@@ -327,12 +328,19 @@ class SequenceFrontEnd:
         self.instrument_frame = tk.Frame(self.top_frame, **frame_options)
         self.instrument_frame.pack(side = tk.RIGHT, anchor=tk.E)
 
+        self.instrument_frame_top = tk.Frame(self.instrument_frame, **frame_options)
+        self.instrument_frame_top.pack()
+
         self.list_frame = SFE_ListFrame(self.left_frame, self.sample_list)
         self.list_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
-        self.instrument_combo = ttk.Combobox(self.instrument_frame, textvariable=self.instrument, values=list(datamodel.methods.keys()), state='readonly', width=20)
-        
-        self.instrument_combo.pack()
+        self.instrument_combo = ttk.Combobox(self.instrument_frame_top, textvariable=self.instrument, values=list(datamodel.instrument_data.keys()), state='readonly', width=20)
+        self.instrument_combo.pack(side=tk.LEFT, anchor=tk.NW)
+
+        self.dda_button = tk.Radiobutton(self.instrument_frame_top, text="DDA", var=self.diadda_selection, value="DDA", command=self.onInstrumentChoice)
+        self.dia_button = tk.Radiobutton(self.instrument_frame_top, text="DIA", var=self.diadda_selection, value="DIA", command=self.onInstrumentChoice)
+        self.dda_button.pack(side=tk.LEFT)
+        self.dia_button.pack(side=tk.LEFT)
 
         self.start_well_picker = SFE_WellPicker(self.right_frame, self.sample_list.getSampleCount(), self.rebuild)
         self.start_well_picker.pack()
@@ -368,7 +376,11 @@ class SequenceFrontEnd:
         return
     
     def onInstrumentChoice(self, event=None):
-        self.method_chooser.combo.config(values = datamodel.methods[self.instrument.get()])
+        # self.method_chooser.combo.config(values = datamodel.methods[self.instrument.get()])
+        meth_list = datamodel.instrument_data[self.instrument.get()]['methods'][self.diadda_selection.get()]
+        if not meth_list:
+            meth_list = ["NOT SUPPORTED"]
+        self.method_chooser.combo.config(values=meth_list)
         self.method_chooser.combo.current(0)
         self.rebuild()
         return
