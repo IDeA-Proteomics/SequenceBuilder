@@ -4,7 +4,7 @@
         "methods": {
             "DDA": [],
             "DIA": [
-                "C:\\Xcalibur\\methods\\DIA\\60min_5ulLoad_10ulLoop\\DIA_12mz_15k_60min_5ulLoad_10ulLoop_031221"
+                "C:\\Xcalibur\\methods\\DIA\\60min_5ulLoad_10ulLoop_ulPickup\\DIA_12mz_15k_60min_5ulLoad_10ulLoop_052423"
             ],
             "QC": "C:\\Xcalibur\\methods\\DIA\\60min_5ulLoad_10ulLoop_ulPickup\\DDA_60min_5ulLoad_10ulLoop_pickup_071423",
             "blank": "C:\\Xcalibur\\methods\\DIA\\60min_5ulLoad_10ulLoop_ulPickup\\DDA_60min_5ulLoad_10ulLoop_pickup_071423",
@@ -18,7 +18,7 @@
         "methods": {
             "DDA": [],
             "DIA": [
-                "C:\\Xcalibur\\methods\\DIA\\60min_5ulLoad_10ulLoop\\DIA_12mz_15k_60min_5ulLoad_10ulLoop_031221"
+                "C:\\Xcalibur\\methods\\DIA\\60min_5ulLoad_10ulLoop_ulPickup\\DIA_12mz_15k_60min_5ulLoad_10ulLoop_052423"
             ],
             "QC": "C:\\Xcalibur\\methods\\DIA\\60min_5ulLoad_10ulLoop_ulPickup\\DDA_60min_5ulLoad_10ulLoop_pickup_071423",
             "blank": "C:\\Xcalibur\\methods\\DIA\\60min_5ulLoad_10ulLoop_ulPickup\\DDA_60min_5ulLoad_10ulLoop_pickup_071423",
