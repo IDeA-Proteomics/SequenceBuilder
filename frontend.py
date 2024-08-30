@@ -455,6 +455,8 @@ class SequenceFrontEnd:
 
 def showSeqFE():
     root = tk.Tk()
+    root.iconbitmap("IDEA_Logo.ico")
+    root.title("IDEA Sequence Builder")
     front_end = SequenceFrontEnd(root)
     root.mainloop()
 
