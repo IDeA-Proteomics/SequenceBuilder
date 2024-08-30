@@ -12,6 +12,8 @@ import json
 
 frame_options = {'highlightbackground':'black' , 'highlightthickness':1}
 
+rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+
 class SFE_TrayPicker(tk.Frame):
 
     def __init__(self, parent, select_var, command):
@@ -70,7 +72,12 @@ class SFE_WellPicker(tk.Frame):
         self.pos_choices = self.getPositionList()
         self.combo_vals = self.pos_choices[:97-self.count]
         self.combo.config(values = self.combo_vals)
-        self.pool_vals = [i for i in self.pos_choices if i not in self.getSamplePosistions()]
+        if self.count < 96:
+            self.pool_vals = [i for i in self.pos_choices if i not in self.getSamplePosistions()]
+        else:
+            second_tray = 'B' if self.tray_selection.get()[:1] == 'G' else 'G'
+            second_tray_list = [second_tray + row + str(pos) for row in rows for pos in range(1,13)]
+            self.pool_vals = [i for i in self.pos_choices + second_tray_list if i not in self.getSamplePosistions()]
         self.pool_combo.config(values = self.pool_vals)
         if self.pool_position.get() not in self.pool_vals:
             self.pool_position.set(self.pool_vals[-1])
@@ -83,7 +90,7 @@ class SFE_WellPicker(tk.Frame):
         return
     
     def getPositionList(self):
-        rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        
         retval = [self.tray_selection.get()[:1] + row + str(pos) for row in rows for pos in range(1,13)]
         return retval
     
@@ -91,6 +98,14 @@ class SFE_WellPicker(tk.Frame):
 
         pos_list = self.getPositionList()
         idx = pos_list.index(self.start_position.get())
+
+        if self.count > 96:
+
+            second_tray = 'B' if self.tray_selection.get()[:1] == 'G' else 'G'
+
+            second_tray_list = [second_tray + row + str(pos) for row in rows for pos in range(1,13)]
+
+            pos_list = pos_list + second_tray_list
         
         return pos_list[idx:idx+self.count]
     
@@ -296,6 +311,7 @@ class SequenceFrontEnd:
         self.gpf = tk.IntVar(value=0)
         self.random = tk.IntVar(value=0)
         self.addqc = tk.IntVar(value=0)
+        self.add_blanks = tk.IntVar(value=0)
         self.instrument = tk.StringVar(value="Exploris2")
         self.diadda_selection = tk.StringVar(value="DDA")
 
@@ -360,6 +376,13 @@ class SequenceFrontEnd:
                              onvalue=1, offvalue=0, command=self.rebuild)
         self.addqc_check.pack()
 
+        self.add_blanks_label = tk.Label(self.right_frame, text="Add blank every n runs")
+        self.add_blanks_label.pack()
+        self.add_blanks_combo = ttk.Combobox(self.right_frame, values=[i for i in range(51)], state='readonly')
+        self.add_blanks_combo.current(0)
+        self.add_blanks_combo.pack()
+        self.add_blanks_combo.bind('<<ComboboxSelected>>', self.rebuild)
+
         self.method_chooser = SFE_MethodChooser(self.instrument_frame)
         self.method_chooser.pack()
 
@@ -397,6 +420,9 @@ class SequenceFrontEnd:
         self.list_frame.sfe_sequence_text.buildSequenceText()
 
         return
+    
+    def getAddBlanks(self):
+        return self.add_blanks_combo.get()
 
     def getSamplePositions(self):
         return self.start_well_picker.getSamplePosistions()

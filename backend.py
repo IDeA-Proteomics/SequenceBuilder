@@ -11,7 +11,7 @@ import datamodel
 class SampleList():
 
     def sanitizeName(self, name):
-        newName = re.sub(r"[ +\[\].]+", '_', str(name))
+        newName = re.sub(r"[ +\[\]\.\+!@#\$%\^&\*\(\)\?\|\\]+", '_', str(name))
         if newName[0].isdigit():
             newName = 'S' + newName
         return newName
@@ -65,6 +65,7 @@ class SampleList():
             else:
                 name = name + "_sample_{}".format(self.list.loc[i, 'number'])
             self.list.at[i, 'name'] = name
+
 
 
         self.sequence = pd.DataFrame(
@@ -238,8 +239,43 @@ class SampleList():
             halfway = int(len(self.sequence)/2)
             self.sequence = pd.concat([self.sequence.iloc[:halfway], self.buildGPF(), self.sequence.iloc[halfway:]]).reset_index(drop=True)
 
+        if (self.getAddBlanks() > 0):
+            bl_list = []
+            last_i = 0
+            for i in range(self.getAddBlanks(), len(self.sequence), self.getAddBlanks()):
+                bl_list.append(self.sequence.iloc[last_i : i])
+                last_i = i
+                blank = {
+                'Sample Type':'Unknown',
+                'File Name' : "Blank",
+                'Sample ID':"Blank",
+                'Path':"D:\\" + self.project_name,
+                'Instrument Method': datamodel.instrument_data[self.getInstrument()]['methods']['blank'],
+                'Position': "G1",
+                'Inj Vol': str(datamodel.instrument_data[self.getInstrument()]['loop_vol']),
+                'Sample Name':"Blank"
+                }
+                rinse = {
+                'Sample Type':'Unknown',
+                'File Name' : "Rinse",
+                'Sample ID':"Rinse",
+                'Path':"D:\\" + self.project_name,
+                'Instrument Method': datamodel.instrument_data[self.getInstrument()]['methods']['rinse'],
+                'Position': "G1",
+                'Inj Vol': str(datamodel.instrument_data[self.getInstrument()]['loop_vol']),
+                'Sample Name':"Rinse"
+                }
+
+                bl_list.append(pd.DataFrame.from_records([rinse, blank], index=range(2)))
+            
+            bl_list.append(self.sequence.iloc[last_i:])
+
+            self.sequence = pd.concat(bl_list).reset_index(drop=True)
+
         if self.front.getAddQC() == 1:
             self.sequence = pd.concat([self.buildBlankQC("pre"), self.sequence, self.buildBlankQC("post")]).reset_index(drop=True)
+
+        
 
         return
     
@@ -252,7 +288,7 @@ class SampleList():
         self.sequence.to_csv(fname, index=False, mode='a')
 
         
-        self.buildGPF()
+        # self.buildGPF()
         return
     
     
@@ -262,6 +298,9 @@ class SampleList():
 
         return
     
+    def getAddBlanks(self):
+        return int(self.front.getAddBlanks())
+
     def getMethod(self):
         return self.front.getMethod()
     
@@ -272,7 +311,7 @@ class SampleList():
         return self.front.getPoolWell()
     
     def getSampleCount(self):
-        return len(self.data)
+        return len(self.data.index)
     
     def getSequenceCount(self):
         return len(self.sequence)
