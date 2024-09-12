@@ -5,6 +5,7 @@ from tkinter import filedialog
 from backend import *
 import datamodel
 import json
+import popups
 
 ### 1 = RED
 ### 2 - GREEN
@@ -448,14 +449,23 @@ class SequenceFrontEnd:
     def getInstrument(self):
         return self.instrument.get()
     
+    def askProjectName(self):
+
+        asker = popups.AskProjName(self.parent)
+        # asker.wait_window()
+        rv = asker.result
+
+        return rv
+    
 
 
 
 
 
 def showSeqFE():
+    os.chdir("C:\\Automate\\")
     root = tk.Tk()
-    root.iconbitmap("IDEA_Logo.ico")
+    # root.iconbitmap("IDEA_Logo.ico")
     root.title("IDEA Sequence Builder")
     front_end = SequenceFrontEnd(root)
     root.mainloop()

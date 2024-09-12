@@ -26,10 +26,10 @@ class SampleList():
         self.abs_path = os.path.abspath(self.path)
 
         split_name = self.abs_path.split('\\')[-1]
-        proj_pattern = r'([^/]+_\d{6}.*)(?=_SampleList\.xlsx)'
+        proj_pattern = r'([^/]+_\d{6}.*)(?=_SampleList.xlsx)'
         match = re.match(proj_pattern, split_name)
 
-        self.project_name = match.group(1) if match else "Bad Name"
+        self.project_name = match.group(1) if match else self.front.askProjectName()
 
         ####  Examine XLS file.  Find row with headers and last sample (first empty after samples)
 
