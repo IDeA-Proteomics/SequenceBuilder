@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
-# from IDeA_classes import SampleList
 from backend import *
 import datamodel
 import json
@@ -307,6 +306,9 @@ class SequenceFrontEnd:
 
         self.parent = parent
         self.file_name = filedialog.askopenfilename(initialdir="Z:\\Active_projects")
+        if self.file_name == "":
+            self.onExit()
+            exit()
         self.sample_list = SampleList(self, self.file_name)
         self.pool = tk.IntVar(value=0)
         self.gpf = tk.IntVar(value=0)
@@ -400,8 +402,8 @@ class SequenceFrontEnd:
     
     def onExit(self):
         self.parent.destroy()
-        with open("instrument_data.json", 'w') as jf:
-            json.dump(datamodel.instrument_data, jf, ensure_ascii=False, indent=4 )
+        # with open("instrument_data.json", 'w') as jf:
+        #     json.dump(datamodel.instrument_data, jf, ensure_ascii=False, indent=4 )
 
     
     def onInstrumentChoice(self, event=None):
@@ -465,7 +467,7 @@ class SequenceFrontEnd:
 def showSeqFE():
     os.chdir("C:\\Automate\\")
     root = tk.Tk()
-    # root.iconbitmap("IDEA_Logo.ico")
+    root.iconbitmap("IDEA_Logo.ico")
     root.title("IDEA Sequence Builder")
     front_end = SequenceFrontEnd(root)
     root.mainloop()
