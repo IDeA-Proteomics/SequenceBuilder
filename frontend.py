@@ -404,6 +404,24 @@ class SequenceFrontEnd:
 
     
     def onInstrumentChoice(self, event=None):
+
+        if len(datamodel.instrument_data[self.instrument.get()]['methods']['DDA']) > 0:
+            self.dda_button.config(state=tk.NORMAL)
+        else:
+            self.dda_button.config(state=tk.DISABLED)
+            self.diadda_selection.set('DIA')
+        
+        if len(datamodel.instrument_data[self.instrument.get()]['methods']['DIA']) > 0:
+            self.dia_button.config(state=tk.NORMAL)
+        else:
+            self.dia_button.config(state=tk.DISABLED)
+            self.diadda_selection.set('DDA')
+            
+        if (self.instrument.get() == 'Exploris1' or self.instrument.get() == 'Exploris2') and self.diadda_selection.get() == 'DIA':
+            self.gpf_check.config(state=tk.NORMAL)
+        else:
+            self.gpf_check.config(state=tk.DISABLED)
+
         meth_list = datamodel.instrument_data[self.instrument.get()]['methods'][self.diadda_selection.get()]
         if not meth_list:
             meth_list = ["NOT SUPPORTED"]
@@ -417,11 +435,6 @@ class SequenceFrontEnd:
         self.list_frame.sfe_list_text.buildListText()
         self.sample_list.reBuildSequence()
         self.list_frame.sfe_sequence_text.buildSequenceText()
-
-        if (self.instrument.get() == 'Exploris1' or self.instrument.get() == 'Exploris2') and self.diadda_selection.get() == 'DIA':
-            self.gpf_check.config(state=tk.NORMAL)
-        else:
-            self.gpf_check.config(state=tk.DISABLED)
 
         return
     
