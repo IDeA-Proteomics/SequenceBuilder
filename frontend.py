@@ -464,6 +464,13 @@ class SequenceFrontEnd:
         rv = asker.choice.get()
         return rv
 
+    def askSaveAsName(self, dir, name):
+        save_path = filedialog.asksaveasfilename(initialdir=dir, initialfile=name, defaultextension='.csv', filetypes=[('CSV', '*.csv'), ('All files', '*.*')])
+        if save_path:
+            return save_path
+        else:
+            return None
+
     
 
 

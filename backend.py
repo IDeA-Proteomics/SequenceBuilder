@@ -297,13 +297,16 @@ class SampleList():
     def outputSequence(self):
         self.reBuildSequence()
         template = "Bracket Type=4,\n"
-        fname = "{}\\{}_Injection_Sequence.csv".format(os.path.dirname(self.abs_path), self.project_name)
+        # fname = "{}\\{}_Injection_Sequence.csv".format(os.path.dirname(self.abs_path), self.project_name)
+        iname = "{}_Injection_Sequence.csv".format(self.project_name)
+        fname = self.front.askSaveAsName(os.path.dirname(self.abs_path), iname)
+        if not fname:
+            fname = "{}\\{}_Injection_Sequence.csv".format(os.path.dirname(self.abs_path), self.project_name)
         with open(fname, 'w') as fp:
             fp.write(template)
         self.sequence.to_csv(fname, index=False, mode='a')
-
+        self.front.onExit()
         
-        # self.buildGPF()
         return
     
     
