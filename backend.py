@@ -47,10 +47,6 @@ class SampleList():
                     if sh.cell(row = i, column=j).value == "sample number":
                         self.head_row = i
                         break
-            # if all([cell.value is None for cell in sh[i]]):
-            #     if self.head_row != None and i > self.head_row:
-            #         self.last_row = i
-            #         break
         
 
         if self.head_row == None:

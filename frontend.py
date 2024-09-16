@@ -6,9 +6,6 @@ import datamodel
 import json
 import popups
 
-### 1 = RED
-### 2 - GREEN
-### 3 - BLUE
 
 frame_options = {'highlightbackground':'black' , 'highlightthickness':1}
 
@@ -407,7 +404,6 @@ class SequenceFrontEnd:
 
     
     def onInstrumentChoice(self, event=None):
-        # self.method_chooser.combo.config(values = datamodel.methods[self.instrument.get()])
         meth_list = datamodel.instrument_data[self.instrument.get()]['methods'][self.diadda_selection.get()]
         if not meth_list:
             meth_list = ["NOT SUPPORTED"]
@@ -454,7 +450,6 @@ class SequenceFrontEnd:
     def askProjectName(self):
 
         asker = popups.AskProjName(self.parent)
-        # asker.wait_window()
         rv = asker.result
 
         return rv
