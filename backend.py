@@ -11,7 +11,7 @@ import datamodel
 class SampleList():
 
     def sanitizeName(self, name):
-        newName = re.sub(r"[ +\[\]\.\+!@#\$%\^&\*\(\)\?\|\\]+", '_', str(name))
+        newName = re.sub(r"[ +\[\]\.\+!/@#\$%\^&\*\(\)\?\|\\]+", '_', str(name))
         if newName[0].isdigit():
             newName = 'S' + newName
         return newName
