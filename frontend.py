@@ -418,6 +418,11 @@ class SequenceFrontEnd:
         self.sample_list.reBuildSequence()
         self.list_frame.sfe_sequence_text.buildSequenceText()
 
+        if (self.instrument.get() == 'Exploris1' or self.instrument.get() == 'Exploris2') and self.diadda_selection.get() == 'DIA':
+            self.gpf_check.config(state=tk.NORMAL)
+        else:
+            self.gpf_check.config(state=tk.DISABLED)
+
         return
     
     def getAddBlanks(self):

@@ -118,7 +118,7 @@ class SampleList():
             mz_start = 300 + (100*i)
             mz_end = 300 + (100*i)
             filename = f'{self.project_name}_GPF6_{i}'
-            gpf_method_template = r"C:\\Xcalibur\\methods\\DIA\\60min_5ulLoad_10ulLoop\\DIA_GPF_{mz_start}_{mz_end}_60min_5ulLoad_10ulLoop_031221"
+            gpf_method_template = r"C:\Xcalibur\methods\DIA\60min_5ulLoad_10ulLoop\DIA_GPF_{mz_start}_{mz_end}_60min_5ulLoad_10ulLoop_031221"
             meth_name = gpf_method_template.format(mz_start=mz_start, mz_end=mz_end)
             w.append({'Sample Type':'Unknown', 
                       'File Name':filename, 
