@@ -458,6 +458,17 @@ class SequenceFrontEnd:
         rv = asker.result
 
         return rv
+
+    def askHeaderRow(self, sh):
+        asker = popups.AskHeaderRow(self.parent, sh)
+        rv = (asker.row, asker.choice.get())
+        return rv
+
+    def askNameHeader(self, sh, row):
+        asker = popups.askNameColumn(self.parent, sh, row)
+        rv = asker.choice.get()
+        return rv
+
     
 
 

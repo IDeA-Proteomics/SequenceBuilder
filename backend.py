@@ -36,6 +36,9 @@ class SampleList():
         wb = load_workbook(self.abs_path, data_only=True)
         sh = wb.worksheets[0]
 
+        namestr = 'sample name'
+        numstr = 'sample number'
+
         self.head_row = None
         self.last_row = None
         for i in range(1, sh.max_row + 1):
@@ -44,16 +47,32 @@ class SampleList():
                     if sh.cell(row = i, column=j).value == "sample number":
                         self.head_row = i
                         break
+            # if all([cell.value is None for cell in sh[i]]):
+            #     if self.head_row != None and i > self.head_row:
+            #         self.last_row = i
+            #         break
+        
+
+        if self.head_row == None:
+            headrv = self.front.askHeaderRow(sh)
+            self.head_row = headrv[0]
+            numstr = headrv[1]
+
+        if namestr not in [cell.value for cell in sh[self.head_row]]:
+            namestr = self.front.askNameHeader(sh, self.head_row)
+
+        for i in range(self.head_row, sh.max_row + 1):
             if all([cell.value is None for cell in sh[i]]):
-                if self.head_row != None and i > self.head_row:
-                    self.last_row = i
-                    break
+                self.last_row = i
+                break
         if self.last_row == None:
             self.last_row = sh.max_row + 1
+                
+
 
 
         self.data = pd.read_excel(self.abs_path, engine='openpyxl', skiprows=self.head_row - 1, nrows=(self.last_row - self.head_row))
-        self.list = pd.DataFrame(data=self.data[['sample number', 'sample name']].values, columns=['number', 'name'])
+        self.list = pd.DataFrame(data=self.data[[numstr, namestr]].values, columns=['number', 'name'])
         self.list['method'] = "None"
         self.list['position'] = "NA"
         self.list['name'] = self.list['name'].apply(self.sanitizeName)
