@@ -33,6 +33,7 @@ class AskHeaderRow(tk.Toplevel):
         self.next_button = tk.Button(self.button_frame, text="Next Row", command=self.displayRow)
         self.next_button.pack(side=tk.LEFT)
 
+        self.parent.eval(f'tk::PlaceWindow {str(self)} center')
         self.transient(self.parent)
         self.grab_set()
         self.parent.wait_window(self)
@@ -82,6 +83,7 @@ class askNameColumn(tk.Toplevel):
         self.done_button = tk.Button(self.button_frame, text="Done", command=self.onDone)
         self.done_button.pack(side=tk.LEFT)
 
+        self.parent.eval(f'tk::PlaceWindow {str(self)} center')
         self.transient(self.parent)
         self.grab_set()
         self.parent.wait_window(self)
@@ -121,6 +123,7 @@ class AskProjName(tk.Toplevel):
 
         self.frame.pack()
 
+        self.parent.eval(f'tk::PlaceWindow {str(self)} center')
         self.transient(self.parent)
         self.grab_set()
         self.parent.wait_window(self)
