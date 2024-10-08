@@ -496,7 +496,6 @@ class SequenceFrontEnd:
 
 
 def showSeqFE():
-    # os.chdir("C:\\Automate\\")
     root = tk.Tk()
     root.eval('tk::PlaceWindow . center')
     root.iconbitmap("IDEA_Logo.ico")
