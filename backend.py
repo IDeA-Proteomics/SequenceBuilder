@@ -22,6 +22,7 @@ class SampleList():
             datamodel.instrument_data = json.load(jf)
         self.front = front
         self.path = filename
+        self.new_style = False
 
         self.abs_path = os.path.abspath(self.path)
 
@@ -43,16 +44,22 @@ class SampleList():
         self.last_row = None
         for i in range(1, sh.max_row + 1):
             if self.head_row == None:
-                for j in range (1, sh.max_column + 1):
-                    if sh.cell(row = i, column=j).value == "sample number":
-                        self.head_row = i
-                        break
+                if sh.cell(row = i, column=1).value == "sample identifier":
+                    self.head_row = i
+                    self.new_style = True
+                    break
+                else: 
+                    for j in range (1, sh.max_column + 1):
+                        if sh.cell(row = i, column=j).value == "sample number":
+                            self.head_row = i
+                            break
         
 
         if self.head_row == None:
             headrv = self.front.askHeaderRow(sh)
             self.head_row = headrv[0]
             numstr = headrv[1]
+        
 
         if namestr not in [cell.value for cell in sh[self.head_row]]:
             namestr = self.front.askNameHeader(sh, self.head_row)
@@ -68,18 +75,22 @@ class SampleList():
 
 
         self.data = pd.read_excel(self.abs_path, engine='openpyxl', skiprows=self.head_row - 1, nrows=(self.last_row - self.head_row))
-        self.list = pd.DataFrame(data=self.data[[numstr, namestr]].values, columns=['number', 'name'])
+        if self.new_style:
+            self.list = pd.DataFrame(data=self.data[[numstr, 'sample identifier']].values, columns=[ 'number', 'name' ])
+        else:
+            self.list = pd.DataFrame(data=self.data[[numstr, namestr]].values, columns=['number', 'name'])
+            self.list['name'] = self.list['name'].apply(self.sanitizeName)            
+            for i in self.list.index:
+                name = self.list.loc[i, 'name']
+                if type(self.list.loc[i, 'number']) == int:
+                    name = name + "_sample_{:02d}".format(self.list.loc[i, 'number'])
+                else:
+                    name = name + "_sample_{}".format(self.list.loc[i, 'number'])
+                self.list.at[i, 'name'] = name
+
         self.list['method'] = "None"
         self.list['position'] = "NA"
-        self.list['name'] = self.list['name'].apply(self.sanitizeName)
 
-        for i in self.list.index:
-            name = self.list.loc[i, 'name']
-            if type(self.list.loc[i, 'number']) == int:
-                name = name + "_sample_{:02d}".format(self.list.loc[i, 'number'])
-            else:
-                name = name + "_sample_{}".format(self.list.loc[i, 'number'])
-            self.list.at[i, 'name'] = name
 
 
 
@@ -231,7 +242,10 @@ class SampleList():
         else:
             temp_list = self.list
         self.sequence['Sample Type'] = "Unknown"
-        self.sequence['File Name'] = [self.project_name + '_' + str(x) for x in temp_list['name']]
+        if self.new_style:
+            self.sequence['File Name'] = [str(x) for x in temp_list['name']]
+        else:
+            self.sequence['File Name'] = [self.project_name + '_' + str(x) for x in temp_list['name']]
         self.sequence['Sample ID'] = temp_list['number']
         self.sequence['Path'] = "D:\\" + self.project_name 
         self.sequence['Instrument Method'] = self.getMethod()
@@ -289,6 +303,13 @@ class SampleList():
 
         if self.front.getAddQC() == 1:
             self.sequence = pd.concat([self.buildBlankQC("pre"), self.sequence, self.buildBlankQC("post")]).reset_index(drop=True)
+
+        # if self.front.getTest() == 1:
+        #     ### Find sample 1 and copy
+
+        #     ###  Change inj vol for that sample
+
+        #     ### Concat onto front of sequence. 
 
         
 

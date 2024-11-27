@@ -307,13 +307,14 @@ class SequenceFrontEnd:
             self.onExit()
             exit()
         self.sample_list = SampleList(self, self.file_name)
-        self.pool = tk.IntVar(value=0)
+        # self.test = tk.IntVar(value=1)
+        self.pool = tk.IntVar(value=1)
         self.gpf = tk.IntVar(value=0)
-        self.random = tk.IntVar(value=0)
-        self.addqc = tk.IntVar(value=0)
+        self.random = tk.IntVar(value=1)
+        self.addqc = tk.IntVar(value=1)
         self.add_blanks = tk.IntVar(value=0)
         self.instrument = tk.StringVar(value="Exploris2")
-        self.diadda_selection = tk.StringVar(value="DDA")
+        self.diadda_selection = tk.StringVar(value="DIA")
 
         self.buildUI()
         return
@@ -359,6 +360,10 @@ class SequenceFrontEnd:
 
         self.start_well_picker = SFE_WellPicker(self.right_frame, self.sample_list.getSampleCount(), self.rebuild)
         self.start_well_picker.pack()
+
+        # self.test_check = tk.Checkbutton(self.right_frame, text="Test Sample", variable=self.test,
+        #                                  onvalue=1, offvalue=0, command=self.rebuild)
+        # self.test_check.pack()
 
         self.pool_check = tk.Checkbutton(self.right_frame, text="Include Pool", variable=self.pool,
                                          onvalue=1, offvalue=0, command=self.rebuild)
@@ -455,6 +460,9 @@ class SequenceFrontEnd:
     
     def getGPF(self):
         return self.gpf.get()
+
+    def getTest(self):
+        return self.test.get()
     
     def getPool(self):
         return self.pool.get()
