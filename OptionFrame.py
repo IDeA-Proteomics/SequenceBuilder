@@ -133,6 +133,7 @@ class OptionFrame(tk.Frame):
         if self.datamodel.project_loaded:
             combo_vals += self.datamodel.sample_list
         self.test_combo.config(values=combo_vals)
+        self.onChange()
         return
 
     def onRandomChange(self):

@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter import filedialog
+from tkinter import messagebox, filedialog, Menu
 
 from datamodel import *
 from SequenceWidgets import *
@@ -133,6 +133,8 @@ class SequenceApp():
         return
 
     def buildUI(self):
+
+        self.createMenu()
         
         self.main_frame = tk.Frame(self.root_window, **frame_options)
         self.top_frame = tk.Frame(self.main_frame, **frame_options)
@@ -186,6 +188,37 @@ class SequenceApp():
     def onRandom(self):
         self.datamodel.randomize()
         self.list_frame.refreshProject()
+
+    
+
+    ##################################
+    ######   Menu
+    #################################
+
+    def filemenu_open(self):
+        filename = filedialog.askopenfilename(parent=self.root_window, title="Open Sample List", filetypes=(("Excel Files", "*_SampleList.xlsx"),("All Files", "*.*")))
+        if filename:
+            self.datamodel.openSampleList(filename)
+            self.onLoad()
+        return
+    
+    def createMenu(self):
+
+        self.filemenu_items = {'Open':self.filemenu_open}
+
+        self.menubar = Menu(self.root_window)
+
+        self.filemenu = Menu(self.menubar, tearoff=0)
+        for k,v in self.filemenu_items.items():
+            self.filemenu.add_command(label=k, command=v)
+
+        self.menubar.add_cascade(label="File", menu=self.filemenu)
+
+        self.root_window.config(menu=self.menubar)
+
+        return
+
+
 
 
 
