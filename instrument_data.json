@@ -12,7 +12,8 @@
             "rinse": "C:\\Xcalibur\\methods\\Sawtooth_wash_DDA_30min",
             "end": "C:\\Xcalibur\\methods\\MeOH_Sawtooth__DDA_10min_end_on_80"
         },
-        "loop_vol": 10
+        "loop_vol": 10,
+        "tray_separator": ""
     },
     "Exploris2": {
         "name": "X2",
@@ -27,7 +28,8 @@
             "rinse": "C:\\Xcalibur\\methods\\Sawtooth_wash_DDA_30min",
             "end": "C:\\Xcalibur\\methods\\Methanol_wash_10min_end_on_90_111523"
         },
-        "loop_vol": 10
+        "loop_vol": 10,
+        "tray_separator": ""
     },
     "Eclipse1": {
         "name": "E1",
@@ -39,7 +41,8 @@
             "rinse": "",
             "end": ""
         },
-        "loop_vol": 20
+        "loop_vol": 20,
+        "tray_separator": ""
     },
     "Eclipse2": {
         "name": "E2",
@@ -55,7 +58,8 @@
             "rinse": "C:\\Xcalibur\\methods\\sawtooth_30min_042722",
             "end": "C:\\Xcalibur\\methods\\Hold_50percent_B_30min_end_at_80percent"
         },
-        "loop_vol": 20
+        "loop_vol": 20,
+        "tray_separator": ""
     },
     "Fusion1": {
         "name": "F1",
@@ -69,7 +73,8 @@
             "rinse": "C:\\Xcalibur\\methods\\rinse_20min_Fusion",
             "end": "C:\\Xcalibur\\methods\\Fusion_60min_end_at_80percent"
         },
-        "loop_vol": 20
+        "loop_vol": 20,
+        "tray_separator": ""
     },
     "Fusion2": {
         "name": "F2",
@@ -83,6 +88,7 @@
             "rinse": "C:\\Xcalibur\\methods\\Sawtooth_60min_050622",
             "end": "C:\\Xcalibur\\methods\\Fusion_60min_10uL_011323_end_on_80percent"
         },
-        "loop_vol": 20
+        "loop_vol": 20,
+        "tray_separator": ""
     }
 }
