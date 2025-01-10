@@ -137,6 +137,7 @@ class SequenceApp():
         self.createMenu()
         
         self.main_frame = tk.Frame(self.root_window, **frame_options)
+        self.top_buttons_frame = tk.Frame(self.main_frame, **frame_options)
         self.top_frame = tk.Frame(self.main_frame, **frame_options)
         self.body_frame = tk.Frame(self.main_frame, **frame_options)
         self.left_frame = tk.Frame(self.body_frame, **frame_options)
@@ -144,6 +145,7 @@ class SequenceApp():
         self.bottom_frame = tk.Frame(self.root_window, **frame_options)
 
         self.main_frame.pack(side = tk.TOP, fill=tk.BOTH, expand=True)
+        self.top_buttons_frame.pack(side=tk.TOP, fill=tk.Y, anchor=tk.W)
         self.top_frame.pack(side = tk.TOP, fill=tk.X, anchor = tk.W)
         self.body_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         self.left_frame.pack(side = tk.LEFT, anchor=tk.W, fill=tk.BOTH, expand=True)
@@ -161,11 +163,15 @@ class SequenceApp():
 
         self.instrument_frame = InstrumentFrame(self.top_frame, self.datamodel, self.onInstrumentChange)
         self.instrument_frame.pack(side=tk.RIGHT, anchor=tk.E)
+
+        self.open_button = tk.Button(self.top_buttons_frame, text="Open Sample List", command=self.filemenu_open)
+        self.open_button.pack(side=tk.LEFT, anchor=tk.W)
         
-        self.exit_button = tk.Button(self.bottom_frame, text = "Exit", command = self.onExit)
-        self.create_button = tk.Button(self.bottom_frame, text="Create", command=self.onCreate)
-        self.exit_button.pack(side=tk.LEFT)
-        self.create_button.pack()
+
+        self.create_button = tk.Button(self.top_buttons_frame, text="Create Sequence", command=self.onCreate)
+        self.create_button.pack(side=tk.LEFT, anchor=tk.W)
+        self.exit_button = tk.Button(self.top_buttons_frame, text = "Exit", command = self.onExit)
+        self.exit_button.pack(side=tk.LEFT, anchor=tk.W)
 
         return
     
