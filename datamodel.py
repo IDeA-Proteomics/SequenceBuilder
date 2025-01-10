@@ -21,6 +21,8 @@ class DataModel():
         self.list_reader = None
         self.sample_frame = None
 
+        self.project_loaded = False
+
         self.options = {
             'pool':tk.IntVar(value=1),
             'gpf':tk.IntVar(value=0),
@@ -58,13 +60,15 @@ class DataModel():
         self.project_name_var.set(self.list_reader.project_name)
         self.sample_frame = self.list_reader.sample_frame.reset_index(names='order')
         self.count_var.set(len(self.sample_frame))
+        self.project_loaded = True
         return
     
     def randomize(self):
-        if self.getOption('random'):
-            self.sample_frame = self.sample_frame.sample(frac=1).reset_index(drop=True)
-        else:
-            self.sample_frame = self.sample_frame.sort_values(by='order').reset_index(drop=True)
+        if self.project_loaded:
+            if self.getOption('random'):
+                self.sample_frame = self.sample_frame.sample(frac=1).reset_index(drop=True)
+            else:
+                self.sample_frame = self.sample_frame.sort_values(by='order').reset_index(drop=True)
         return
     
     def getOption(self, key):

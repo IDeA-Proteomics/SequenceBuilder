@@ -85,7 +85,7 @@ class ListFrame(tk.Frame):
         # self.sfe_sequence_text.pack(fill=tk.BOTH,expand=True)
         return
     
-    def refresh(self):
+    def refreshProject(self):
         self.list_text.refresh()
         return
 
@@ -107,8 +107,9 @@ class ListText(tk.Text):
     def buildListText(self):
         self.config(state = 'normal')
         self.delete(1.0, tk.END)
-        for i, sample in enumerate(self.datamodel.sample_list):
-            self.insert(tk.END, "{:>3}| {:>24} |\n".format(i, str(sample)))
+        if self.datamodel.project_loaded:
+            for i, sample in enumerate(self.datamodel.sample_list):
+                self.insert(tk.END, "{:>3}| {:>24} |\n".format(i, str(sample)))
         self.config(state = 'disabled')
 
         return
@@ -153,8 +154,8 @@ class SequenceApp():
         self.list_frame = ListFrame(self.left_frame, self.datamodel)
         self.list_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
-        self.start_well_frame = OptionFrame(self.right_frame, self.datamodel, onStartChange=None, onRandom=self.onRandom)
-        self.start_well_frame.pack(side=tk.TOP)
+        self.option_frame = OptionFrame(self.right_frame, self.datamodel, onStartChange=None, onRandom=self.onRandom)
+        self.option_frame.pack(side=tk.TOP)
 
         self.instrument_frame = InstrumentFrame(self.top_frame, self.datamodel, self.onInstrumentChange)
         self.instrument_frame.pack(side=tk.RIGHT, anchor=tk.E)
@@ -170,16 +171,21 @@ class SequenceApp():
         self.root_window.destroy()
         return
     
+    def onLoad(self):
+        self.list_frame.refreshProject()
+        self.option_frame.refreshProject()
+        
+    
     def onCreate(self):
         return
     
     def onInstrumentChange(self):
-        self.start_well_frame.onChange()
+        self.option_frame.onChange()
         return
     
     def onRandom(self):
         self.datamodel.randomize()
-        self.list_frame.refresh()
+        self.list_frame.refreshProject()
 
 
 

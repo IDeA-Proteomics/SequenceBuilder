@@ -120,10 +120,19 @@ class OptionFrame(tk.Frame):
         self.test_label = tk.Label(self, text="Test Sample")
         self.test_label.pack()
 
-        self.test_combo = ttk.Combobox(self, values=["None"] + self.datamodel.sample_list, textvariable=self.datamodel.test_sample_var, state='readonly', width=30)
-        self.test_combo.option_add('*TCombobox*ListBox.Justify', 'right')
+        combo_vals = [None]
+        if self.datamodel.project_loaded:
+            combo_vals += self.datamodel.sample_list
+        self.test_combo = ttk.Combobox(self, values=combo_vals, textvariable=self.datamodel.test_sample_var, state='readonly', width=30)
         self.test_combo.pack()
          
+        return
+    
+    def refreshProject(self):
+        combo_vals = [None]
+        if self.datamodel.project_loaded:
+            combo_vals += self.datamodel.sample_list
+        self.test_combo.config(values=combo_vals)
         return
 
     def onRandomChange(self):
