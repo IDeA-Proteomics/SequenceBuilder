@@ -1,17 +1,17 @@
 import pandas as pd
-import SampleList
-import datamodel
 import os
 
 
 
 class SequenceBuilder(object):
 
-    def build(self, sample_list, positions, instrument=None, method=None, blanks=0, qc=False, pool_well=None, gpf=False, random=False, inj_vol=2, test=False):
+    def build(self, instrument_data, samples, project_name, positions, instrument=None, method=None, blanks=0, qc=False, pool_well=None, gpf=False, inj_vol=2, test=False):
 
-        self.sample_list = sample_list
-        
-        self.path = "D:\\" + sample_list.project_name
+        self.instrument_data = instrument_data
+        self.samples = samples
+        self.project_name = project_name
+        self.sample_count = len(self.sample_list)        
+        self.path = "D:\\" + self.project_name
         self.method = method
         self.instrument = instrument
         self.inj_vol = inj_vol
@@ -19,7 +19,6 @@ class SequenceBuilder(object):
         self.test = test
         self.blanks = blanks
         self.qc = qc
-        self.random = random
         self.gpf = gpf
         self.positions = positions
 
@@ -28,11 +27,11 @@ class SequenceBuilder(object):
         self.rinse_count = 1
         self.qc_count = 1
 
-        ###  Randomize samples if necessary and convert to dict
-        if self.random:
-            self.samples = self.sample_list.sample_list.sample(frac=1).reset_index(names='order').to_dict('index')
-        else:
-            self.samples = self.sample_list.sample_list.reset_index(names='order').to_dict('records')  
+        # ###  Randomize samples if necessary and convert to dict
+        # if self.random:
+        #     self.samples = self.sample_list.sample(frac=1).reset_index(names='order').to_dict('index')
+        # else:
+        #     self.samples = self.sample_list.reset_index(names='order').to_dict('records')  
 
         ###  Create empty data frame for sequence
         self.sequence = pd.DataFrame(
@@ -69,7 +68,7 @@ class SequenceBuilder(object):
                 if sample['order'] == 0:
                     test = sample
                     test['Sample Type'] = 'Unknown'
-                    test['File Name'] = sample_list.project_name + '_' + str(sample['name']) + '_TEST'
+                    test['File Name'] = self.project_name + '_' + str(sample['name']) + '_TEST'
                     test['Sample ID'] = 'TEST'
                     test['Path'] = self.path
                     test['Instrument Method'] = self.method
@@ -86,11 +85,11 @@ class SequenceBuilder(object):
         self.addToSequence(self.createBlank())
 
         ### iterate through samples and add to sequence
-        for i in range(self.sample_list.sample_count):
+        for i in range(self.sample_count):
             sample = self.samples[i]
             ### Add Sample
             sample['Sample Type'] = 'Unknown'
-            sample['File Name'] = sample_list.project_name + '_' + str(sample['name'])
+            sample['File Name'] = self.project_name + '_' + str(sample['name'])
             sample['Sample ID'] = str(sample['number'])
             sample['Path'] = self.path
             sample['Instrument Method'] = self.method
@@ -100,7 +99,7 @@ class SequenceBuilder(object):
             self.addToSequence(sample)
 
             ### If pool selected and time for pool add pool
-            if i == self.sample_list.sample_count * (self.pool_count / 3):
+            if i == self.sample_count * (self.pool_count / 3):
                 self.addToSequence(self.createPool())
 
             ### If GPF selected and time for GPF add GPF
@@ -134,7 +133,7 @@ class SequenceBuilder(object):
     def createPool(self):
         pool = {}
         pool['Sample Type'] = 'Unknown'
-        pool['File Name'] = f'{self.sample_list.project_name}_Pool_{self.pool_count}'
+        pool['File Name'] = f'{self.project_name}_Pool_{self.pool_count}'
         pool['Sample ID'] = f'Pool_{self.pool_count}'
         pool['Path'] = self.path
         pool['Instrument Method'] = self.method
@@ -151,9 +150,9 @@ class SequenceBuilder(object):
         blank['File Name'] = f'Blank_{self.blank_count}'
         blank['Sample ID'] = f'B{self.blank_count}'
         blank['Path'] = self.path
-        blank['Instrument Method'] = datamodel.instrument_data[self.instrument]['methods']['blank']
+        blank['Instrument Method'] = self.instrument_data[self.instrument]['methods']['blank']
         blank['Position'] = 'G1'
-        blank['Inj Vol'] = str(datamodel.instrument_data[self.instrument]['loop_vol'])
+        blank['Inj Vol'] = str(self.instrument_data[self.instrument]['loop_vol'])
         blank['Sample Name'] = f'Blank_{self.blank_count}'
         self.blank_count += 1
         return blank
@@ -161,12 +160,12 @@ class SequenceBuilder(object):
     def createQC(self, which=None):
         qcrun = {}
         qcrun['Sample Type'] = 'Unknown'
-        qcrun['File Name'] = "QC_"+ datamodel.instrument_data[self.instrument]['name'] +"_JJN3_iRT_" + ("pre_" if which == "pre" else "post_" if which == "post" else ('mid_' + str(self.qc_count) + '_')) + self.sample_list.project_name + "_DDA"
+        qcrun['File Name'] = "QC_"+ self.instrument_data[self.instrument]['name'] +"_JJN3_iRT_" + ("pre_" if which == "pre" else "post_" if which == "post" else ('mid_' + str(self.qc_count) + '_')) + self.project_name + "_DDA"
         qcrun['Sample ID'] = f'QC{self.qc_count}' if which is None else f'QC_{which}'
         qcrun['Path'] = self.path
-        qcrun['Instrument Method'] = datamodel.instrument_data[self.instrument]['methods']['QC']
+        qcrun['Instrument Method'] = self.instrument_data[self.instrument]['methods']['QC']
         qcrun['Position'] = 'RA1'
-        qcrun['Inj Vol'] = str(datamodel.instrument_data[self.instrument]['loop_vol'])
+        qcrun['Inj Vol'] = str(self.instrument_data[self.instrument]['loop_vol'])
         qcrun['Sample Name'] = f'QC_{self.qc_count}' if which is None else f'QC_{which}'
         if which is None:
             self.qc_count += 1
@@ -178,9 +177,9 @@ class SequenceBuilder(object):
         rinse['File Name'] = f"Rinse_{self.rinse_count}"
         rinse['Sample ID'] = f'R{self.rinse_count}'
         rinse['Path'] = self.path
-        rinse['Instrument Method'] = datamodel.instrument_data[self.instrument]['methods']['rinse']
+        rinse['Instrument Method'] = self.instrument_data[self.instrument]['methods']['rinse']
         rinse['Position'] = 'G1'
-        rinse['Inj Vol'] = str(datamodel.instrument_data[self.instrument]['loop_vol'])
+        rinse['Inj Vol'] = str(self.instrument_data[self.instrument]['loop_vol'])
         rinse['Sample Name'] = f'Rinse_{self.rinse_count}'
         self.rinse_count += 1
         return rinse
@@ -191,19 +190,19 @@ class SequenceBuilder(object):
         end['File Name'] = "End"
         end['Sample ID'] = 'E'
         end['Path'] = self.path
-        end['Instrument Method'] = datamodel.instrument_data[self.instrument]['methods']['end']
+        end['Instrument Method'] = self.instrument_data[self.instrument]['methods']['end']
         end['Position'] = 'G1'
-        end['Inj Vol'] = str(datamodel.instrument_data[self.instrument]['loop_vol'])
+        end['Inj Vol'] = str(self.instrument_data[self.instrument]['loop_vol'])
         end['Sample Name'] = 'End'
         return end
 
-    def outputSequence(self):
+    def outputSequence(self, path):
         template = "Bracket Type=4,\n"
-        fname = "{}\\{}_Injection_Sequence.csv".format(os.path.dirname(self.sample_list.path), self.sample_list.project_name)
-        iname = "{}_Injection_Sequence.csv".format(self.sample_list.project_name)
+        fname = "{}\\{}_Injection_Sequence.csv".format(os.path.dirname(path), self.project_name)
+        iname = "{}_Injection_Sequence.csv".format(self.project_name)
         # fname = self.front.askSaveAsName(os.path.dirname(self.abs_path), iname)
         if not fname:
-            fname = "{}\\{}_Injection_Sequence.csv".format(os.path.dirname(self.sample_list.path), self.sample_list.project_name)
+            fname = "{}\\{}_Injection_Sequence.csv".format(os.path.dirname(path), self.project_name)
         with open(fname, 'w') as fp:
             fp.write(template)
         self.sequence.to_csv(fname, index=False, mode='a')

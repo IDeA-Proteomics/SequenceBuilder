@@ -4,6 +4,7 @@ from tkinter import filedialog
 
 from datamodel import *
 from SequenceWidgets import *
+from OptionFrame import *
 
 
 frame_options = {'highlightbackground':'black' , 'highlightthickness':1}
@@ -27,10 +28,11 @@ class HeaderFrame(tk.Frame):
     
 class InstrumentFrame(tk.Frame):
 
-    def __init__(self, parent, datamodel):
+    def __init__(self, parent, datamodel, onChange = None):
 
         self.parent = parent
         self.datamodel = datamodel
+        self.onChange = onChange
         tk.Frame.__init__(self, self.parent)
 
         self.top_frame = tk.Frame(self)
@@ -55,7 +57,66 @@ class InstrumentFrame(tk.Frame):
     def onInstrumentChange(self, event=None):
         self.datamodel.onInstrumentSelection()
         self.method_combo.config(values=self.datamodel.method_list)
+        if self.onChange is not None:
+            self.onChange()
         return
+    
+class ListFrame(tk.Frame):
+
+    def __init__(self, parent, datamodel):
+
+        self.parent = parent    
+        self.datamodel = datamodel
+        tk.Frame.__init__(self, self.parent)
+
+        self.tabs = ttk.Notebook(self)
+        self.plate_tab = tk.Frame(self.tabs)
+        self.sequence_tab = tk.Frame(self.tabs)
+
+        self.tabs.add(self.plate_tab, text = "Plate")
+        # self.tabs.add(self.sequence_tab, text = "Sequence")
+
+        self.tabs.pack(fill = tk.BOTH, expand=True)
+
+        self.list_text = ListText(self.plate_tab, self.datamodel)
+        self.list_text.pack(fill=tk.BOTH,expand=True)
+
+        # self.sfe_sequence_text = SFE_SequenceText(self.sequence_tab, sample_list)
+        # self.sfe_sequence_text.pack(fill=tk.BOTH,expand=True)
+        return
+    
+    def refresh(self):
+        self.list_text.refresh()
+        return
+
+class ListText(tk.Text):
+
+    def __init__(self, parent, datamodel):
+
+        self.parent = parent
+        self.datamodel= datamodel
+        self.scrollbar = tk.Scrollbar(self.parent)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        tk.Text.__init__(self, self.parent, yscrollcommand=self.scrollbar.set)  
+        self.scrollbar.config(command=self.yview)
+        self.buildListText()
+        
+
+        return
+    
+    def buildListText(self):
+        self.config(state = 'normal')
+        self.delete(1.0, tk.END)
+        for i, sample in enumerate(self.datamodel.sample_list):
+            self.insert(tk.END, "{:>3}| {:>24} |\n".format(i, str(sample)))
+        self.config(state = 'disabled')
+
+        return
+    
+    def refresh(self):
+        self.buildListText()
+        return
+
 
 
 
@@ -65,7 +126,7 @@ class SequenceApp():
 
         self.root_window = root
         self.datamodel = DataModel()
-        self.datamodel.openSampleList("/home/david/IDeA_Scripts/TestData/LiuY_20241205_01_DDA_SampleList.xlsx")
+        # self.datamodel.openSampleList("/home/david/IDeA_Scripts/TestData/LiuY_20241205_01_DDA_SampleList.xlsx")
         self.buildUI()
 
         return
@@ -89,10 +150,37 @@ class SequenceApp():
         self.head = HeaderFrame(self.top_frame, self.datamodel)
         self.head.pack(side = tk.LEFT, anchor=tk.W)
 
-        self.instrument_frame = InstrumentFrame(self.top_frame, self.datamodel)
+        self.list_frame = ListFrame(self.left_frame, self.datamodel)
+        self.list_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
+
+        self.start_well_frame = OptionFrame(self.right_frame, self.datamodel, onStartChange=None, onRandom=self.onRandom)
+        self.start_well_frame.pack(side=tk.TOP)
+
+        self.instrument_frame = InstrumentFrame(self.top_frame, self.datamodel, self.onInstrumentChange)
         self.instrument_frame.pack(side=tk.RIGHT, anchor=tk.E)
+        
+        self.exit_button = tk.Button(self.bottom_frame, text = "Exit", command = self.onExit)
+        self.create_button = tk.Button(self.bottom_frame, text="Create", command=self.onCreate)
+        self.exit_button.pack(side=tk.LEFT)
+        self.create_button.pack()
 
         return
+    
+    def onExit(self):
+        self.root_window.destroy()
+        return
+    
+    def onCreate(self):
+        return
+    
+    def onInstrumentChange(self):
+        self.start_well_frame.onChange()
+        return
+    
+    def onRandom(self):
+        self.datamodel.randomize()
+        self.list_frame.refresh()
+
 
 
 
@@ -100,10 +188,10 @@ class SequenceApp():
 def startSequenceApp():
 
     root = tk.Tk()    
+    root.geometry("1200x900")
     root.eval('tk::PlaceWindow . center')
     # root.iconbitmap("IDEA_Logo.ico")
     root.title("IDEA Sequence Builder")
-    root.geometry("900x900")
     app = SequenceApp(root)
     root.mainloop()
 

@@ -13,7 +13,8 @@
             "end": "C:\\Xcalibur\\methods\\MeOH_Sawtooth__DDA_10min_end_on_80"
         },
         "loop_vol": 10,
-        "tray_separator": ""
+        "tray_separator": "",
+        "trays": ["R", "G", "B"]
     },
     "Exploris2": {
         "name": "X2",
@@ -29,7 +30,8 @@
             "end": "C:\\Xcalibur\\methods\\Methanol_wash_10min_end_on_90_111523"
         },
         "loop_vol": 10,
-        "tray_separator": ""
+        "tray_separator": "",
+        "trays": ["R", "G", "B"]
     },
     "Eclipse1": {
         "name": "E1",
@@ -42,7 +44,8 @@
             "end": ""
         },
         "loop_vol": 20,
-        "tray_separator": ""
+        "tray_separator": "",
+        "trays": ["R", "G", "B"]
     },
     "Eclipse2": {
         "name": "E2",
@@ -59,7 +62,8 @@
             "end": "C:\\Xcalibur\\methods\\Hold_50percent_B_30min_end_at_80percent"
         },
         "loop_vol": 20,
-        "tray_separator": ""
+        "tray_separator": "",
+        "trays": ["R", "G", "B"]
     },
     "Fusion1": {
         "name": "F1",
@@ -74,7 +78,8 @@
             "end": "C:\\Xcalibur\\methods\\Fusion_60min_end_at_80percent"
         },
         "loop_vol": 20,
-        "tray_separator": ""
+        "tray_separator": "",
+        "trays": ["R", "G", "B"]
     },
     "Fusion2": {
         "name": "F2",
@@ -89,6 +94,26 @@
             "end": "C:\\Xcalibur\\methods\\Fusion_60min_10uL_011323_end_on_80percent"
         },
         "loop_vol": 20,
-        "tray_separator": ""
+        "tray_separator": "",
+        "trays": ["R", "G", "B"]
+    },
+    "Astral": {
+        "name": "A1",
+        "methods": {
+            "DDA": [
+                "C:\\Xcalibur\\methods\\Astral_60min_10uL_041024_uL_pickup"
+            ],
+            "DIA": [
+                "C:\\Xcalibur\\methods\\Astral_DIA_20min_041024_uL_pickup",
+                "C:\\Xcalibur\\methods\\Astral_DIA_40min_041024_uL_pickup"
+            ],
+            "QC": "C:\\Xcalibur\\methods\\Astral_60min_10uL_041024_uL_pickup",
+            "blank": "C:\\Xcalibur\\methods\\Astral_60min_10uL_041024_uL_pickup",
+            "rinse": "C:\\Xcalibur\\methods\\Astral_Sawtooth_60min_050622",
+            "end": "C:\\Xcalibur\\methods\\Astral_60min_10uL_011323_end_on_80percent"
+        },
+        "loop_vol": 10,
+        "tray_separator": ":",
+        "trays": ["R", "G", "B", "Y"]
     }
 }
