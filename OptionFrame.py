@@ -71,27 +71,27 @@ class OptionFrame(tk.Frame):
         self.onStartChangeCallback = onStartChange     
         self.onRandomChange = onRandom   
 
-        self.pos_choices = self.datamodel.getTrayPositions(self.datamodel.selected_tray)
+        self.pos_choices = self.datamodel.getTrayPositions(self.datamodel.getOption('selected_tray'))
 
         tk.Frame.__init__(self, self.parent)
 
         self.tray_label = tk.Label(self, text="Tray Selection")
         self.tray_label.pack()
 
-        self.tray_picker = TrayPicker(self, self.datamodel.selected_tray_var, self.handleTraySelection, datamodel.settings.default_tray)
+        self.tray_picker = TrayPicker(self, self.datamodel.getOptionVar('selected_tray'), self.handleTraySelection, datamodel.settings.default_tray)
         self.tray_picker.pack()
 
         self.start_label = tk.Label(self, text="Start Well")
         self.start_label.pack()
 
-        self.combo = ttk.Combobox(self, textvariable=self.datamodel.start_position_var, values=self.pos_choices, state='readonly', width=10)
+        self.combo = ttk.Combobox(self, textvariable=self.datamodel.getOptionVar('start_position'), values=self.pos_choices, state='readonly', width=10)
         self.combo.bind('<<ComboboxSelected>>', self.onChange)
         self.combo.pack()   
 
         self.pool_label = tk.Label(self, text="Pool Well")
         self.pool_label.pack()
 
-        self.pool_combo = ttk.Combobox(self, textvariable=self.datamodel.pool_position_var, values=self.pos_choices, state='readonly', width=10)  
+        self.pool_combo = ttk.Combobox(self, textvariable=self.datamodel.getOptionVar('pool_position'), values=self.pos_choices, state='readonly', width=10)  
         self.pool_combo.bind('<<ComboboxSelected>>', self.onChange) 
         self.pool_combo.pack()
 
@@ -113,7 +113,7 @@ class OptionFrame(tk.Frame):
         self.add_blanks_label = tk.Label(self, text="Additional Blank every n samples")
         self.add_blanks_label.pack()
 
-        self.add_blanks_combo = ttk.Combobox(self, values=[str(i) for i in range(51)], textvariable=self.datamodel.blank_every_var, state='readonly')
+        self.add_blanks_combo = ttk.Combobox(self, values=[str(i) for i in range(51)], textvariable=self.datamodel.getOptionVar('blank_every'), state='readonly')
         self.add_blanks_combo.pack()
 
 
@@ -122,8 +122,8 @@ class OptionFrame(tk.Frame):
 
         combo_vals = [None]
         if self.datamodel.project_loaded:
-            combo_vals += self.datamodel.sample_list
-        self.test_combo = ttk.Combobox(self, values=combo_vals, textvariable=self.datamodel.test_sample_var, state='readonly', width=30)
+            combo_vals += self.datamodel.sorted_list
+        self.test_combo = ttk.Combobox(self, values=combo_vals, textvariable=self.datamodel.getOptionVar('test_sample'), state='readonly', width=30)
         self.test_combo.pack()
          
         return
@@ -131,7 +131,7 @@ class OptionFrame(tk.Frame):
     def refreshProject(self):
         combo_vals = [None]
         if self.datamodel.project_loaded:
-            combo_vals += self.datamodel.sample_list
+            combo_vals += self.datamodel.sorted_list
         self.test_combo.config(values=combo_vals)
         self.onChange()
         return

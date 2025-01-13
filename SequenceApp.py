@@ -19,7 +19,7 @@ class HeaderFrame(tk.Frame):
         self.datamodel = datamodel
         tk.Frame.__init__(self, self.parent)
 
-        self.path_label = LabelAndText(self, "Path:", textvariable=self.datamodel.path_var)
+        self.path_label = LabelAndText(self, "Path:", textvariable=self.datamodel.sample_list_path_var)
         self.path_label.pack(side = tk.TOP, anchor=tk.W)
         self.project_label = LabelAndText(self, "Project:", textvariable=self.datamodel.project_name_var)
         self.project_label.pack(side=tk.TOP, anchor=tk.W)
@@ -38,16 +38,16 @@ class InstrumentFrame(tk.Frame):
         self.top_frame = tk.Frame(self)
         self.top_frame.pack(side=tk.TOP)
         
-        self.instrument_combo = ttk.Combobox(self.top_frame, textvariable=self.datamodel.instrument_var, values=list(self.datamodel.instrument_data.keys()), state='readonly', width=20)
+        self.instrument_combo = ttk.Combobox(self.top_frame, textvariable=self.datamodel.getOptionVar('instrument'), values=list(self.datamodel.instrument_list), state='readonly', width=20)
         self.instrument_combo.pack(side=tk.LEFT, anchor=tk.NE)
         self.instrument_combo.bind('<<ComboboxSelected>>', self.onInstrumentChange)
 
-        self.dda_button = tk.Radiobutton(self.top_frame, text="DDA", var=datamodel.diadda_selection_var, value="DDA", command=self.onInstrumentChange)
-        self.dia_button = tk.Radiobutton(self.top_frame, text="DIA", var=datamodel.diadda_selection_var, value="DIA", command=self.onInstrumentChange)
+        self.dda_button = tk.Radiobutton(self.top_frame, text="DDA", var=datamodel.getOptionVar('diadda'), value="DDA", command=self.onInstrumentChange)
+        self.dia_button = tk.Radiobutton(self.top_frame, text="DIA", var=datamodel.getOptionVar('diadda'), value="DIA", command=self.onInstrumentChange)
         self.dda_button.pack(side=tk.LEFT, anchor=tk.E)
         self.dia_button.pack(side=tk.LEFT, anchor=tk.E)
 
-        self.method_combo = ttk.Combobox(self, textvariable=self.datamodel.method_var, values=self.datamodel.method_list, state='readonly', width=100)
+        self.method_combo = ttk.Combobox(self, textvariable=self.datamodel.getOptionVar('method'), values=self.datamodel.method_list, state='readonly', width=100)
         self.method_combo.pack(side=tk.TOP, anchor=tk.E)
 
         self.onInstrumentChange()
@@ -107,9 +107,9 @@ class ListText(tk.Text):
     def buildListText(self):
         self.config(state = 'normal')
         self.delete(1.0, tk.END)
-        if self.datamodel.project_loaded:
-            for i, sample in enumerate(self.datamodel.sample_list):
-                self.insert(tk.END, "{:>3}| {:>24} |\n".format(i, str(sample)))
+        # if self.datamodel.project_loaded:
+        for line in self.datamodel.getSequenceDisplay():
+            self.insert(tk.END, str(line))
         self.config(state = 'disabled')
 
         return
