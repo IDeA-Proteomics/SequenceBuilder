@@ -68,8 +68,8 @@ class DataModel():
         self.sample_frame = self.sample_frame.sample(frac=1).reset_index(drop=True)
         ##  resort and save the random order
         self.sample_frame = self.sample_frame.sort_values(by='order').reset_index(names='random')
-        self.sequence_builder.buildSequence()
         self.project_loaded = True
+        self.sequence_builder.buildSequence()
         return
     
     def randomize(self):
