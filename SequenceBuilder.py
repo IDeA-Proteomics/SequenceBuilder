@@ -171,8 +171,22 @@ class SequenceBuilder(object):
             self.addToSequence(self.createBlank(which='post'))
         
 
-        return
+        return self.sequence
     
+    def outputSequence(self, path):
+        template = "Bracket Type=4,\n"
+        fname = "{}{}{}_Injection_Sequence.csv".format(os.path.dirname(path), os.sep, self.datamodel.project_name)
+        # iname = "{}_Injection_Sequence.csv".format(self.project_name)
+        # fname = self.front.askSaveAsName(os.path.dirname(self.abs_path), iname)
+        if not fname:
+            fname = "{}{}{}_Injection_Sequence.csv".format(os.path.dirname(path), os.sep, self.datamodel.project_name)
+        print(fname)
+        with open(fname, 'w') as fp:
+            fp.write(template)
+        self.sequence.to_csv(fname, index=False, mode='a')
+        # self.front.onExit()
+        
+        return
 
     
 

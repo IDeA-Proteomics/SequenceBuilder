@@ -20,14 +20,15 @@ class LabelAndText(tk.Frame):
     
 class PreAndPostCheck(tk.Frame):
 
-    def __init__(self, parent, label, preVariable, postVariable):
+    def __init__(self, parent, label, preVariable, postVariable, onChange):
         self.parent = parent
 
         tk.Frame.__init__(self, self.parent)
+        self.onChange = onChange
 
         self.label = tk.Label(self, text=label)
-        self.pre = tk.Checkbutton(self, text="pre", variable=preVariable, onvalue=1, offvalue=0)
-        self.post = tk.Checkbutton(self, text="post", variable=postVariable, onvalue=1, offvalue=0)
+        self.pre = tk.Checkbutton(self, text="pre", variable=preVariable, onvalue=1, offvalue=0, command=self.onChange)
+        self.post = tk.Checkbutton(self, text="post", variable=postVariable, onvalue=1, offvalue=0, command=self.onChange)
 
         self.label.pack(side=tk.LEFT)
         self.pre.pack(side=tk.LEFT)

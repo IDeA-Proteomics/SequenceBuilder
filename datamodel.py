@@ -58,6 +58,11 @@ class DataModel():
 
         return
     
+    def onCreateSampleList(self, file_name):
+        print(file_name)
+        self.sequence_builder.outputSequence(file_name)
+        return
+    
     def openSampleList(self, file_name):
         self.list_reader = SampleListReader.SampleListReader(file_name)
         self.sample_list_path_var.set(self.list_reader.path)
@@ -81,6 +86,9 @@ class DataModel():
                 self.sample_frame = self.sample_frame.reset_index(names='random')
         return
     
+    def refreshSequence(self):
+        return self.sequence_builder.buildSequence()        
+
     def getOption(self, key):
         return self.options[key].get()
     

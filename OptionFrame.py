@@ -69,7 +69,7 @@ class OptionFrame(tk.Frame):
         self.parent = parent
         self.datamodel = datamodel
         self.onStartChangeCallback = onStartChange     
-        self.onRandomChange = onRandom   
+        self.onRandomChange = onRandom  
 
         self.pos_choices = self.datamodel.getTrayPositions(self.datamodel.getOption('selected_tray'))
 
@@ -95,19 +95,19 @@ class OptionFrame(tk.Frame):
         self.pool_combo.bind('<<ComboboxSelected>>', self.onChange) 
         self.pool_combo.pack()
 
-        self.pool_check = tk.Checkbutton(self, text="Include Pool", variable=self.datamodel.getOptionVar('pool'), onvalue=1, offvalue=0)
+        self.pool_check = tk.Checkbutton(self, text="Include Pool", variable=self.datamodel.getOptionVar('pool'), onvalue=1, offvalue=0, command=self.onChange)
         self.pool_check.pack()
 
-        self.gpf_check = tk.Checkbutton(self, text="Include GPF", variable=self.datamodel.getOptionVar('gpf'), onvalue=1, offvalue=0)
+        self.gpf_check = tk.Checkbutton(self, text="Include GPF", variable=self.datamodel.getOptionVar('gpf'), onvalue=1, offvalue=0, command=self.onChange)
         self.gpf_check.pack()
 
         self.random_check = tk.Checkbutton(self, text="Randomize", variable=self.datamodel.getOptionVar('random'), onvalue=1, offvalue=0, command=self.onRandomChange)
         self.random_check.pack()
 
-        self.blanks_frame = PreAndPostCheck(self, "Add Blanks", self.datamodel.getOptionVar('pre_blank'), self.datamodel.getOptionVar('post_blank'))
+        self.blanks_frame = PreAndPostCheck(self, "Add Blanks", self.datamodel.getOptionVar('pre_blank'), self.datamodel.getOptionVar('post_blank'), self.onChange)
         self.blanks_frame.pack()
 
-        self.qc_frame = PreAndPostCheck(self, "Add QC", self.datamodel.getOptionVar('pre_qc'), self.datamodel.getOptionVar('post_qc'))
+        self.qc_frame = PreAndPostCheck(self, "Add QC", self.datamodel.getOptionVar('pre_qc'), self.datamodel.getOptionVar('post_qc'), self.onChange)
         self.qc_frame.pack()
 
         self.add_blanks_label = tk.Label(self, text="Additional Blank every n samples")
@@ -115,6 +115,7 @@ class OptionFrame(tk.Frame):
 
         self.add_blanks_combo = ttk.Combobox(self, values=[str(i) for i in range(51)], textvariable=self.datamodel.getOptionVar('blank_every'), state='readonly')
         self.add_blanks_combo.pack()
+        self.add_blanks_combo.bind('<<ComboboxSelected>>', self.onChange)
 
 
         self.test_label = tk.Label(self, text="Test Sample")
@@ -125,6 +126,7 @@ class OptionFrame(tk.Frame):
             combo_vals += self.datamodel.sorted_list
         self.test_combo = ttk.Combobox(self, values=combo_vals, textvariable=self.datamodel.getOptionVar('test_sample'), state='readonly', width=30)
         self.test_combo.pack()
+        self.test_combo.bind('<<ComboboxSelected>>', self.onChange)
          
         return
     

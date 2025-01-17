@@ -158,7 +158,7 @@ class SequenceApp():
         self.list_frame = ListFrame(self.left_frame, self.datamodel)
         self.list_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
-        self.option_frame = OptionFrame(self.right_frame, self.datamodel, onStartChange=None, onRandom=self.onRandom)
+        self.option_frame = OptionFrame(self.right_frame, self.datamodel, onStartChange=self.refreshSequence, onRandom=self.onRandom)
         self.option_frame.pack(side=tk.TOP)
 
         self.instrument_frame = InstrumentFrame(self.top_frame, self.datamodel, self.onInstrumentChange)
@@ -168,7 +168,7 @@ class SequenceApp():
         self.open_button.pack(side=tk.LEFT, anchor=tk.W)
         
 
-        self.create_button = tk.Button(self.top_buttons_frame, text="Create Sequence", command=self.onCreate)
+        self.create_button = tk.Button(self.top_buttons_frame, text="Create Sequence", command=self.filemenu_create)
         self.create_button.pack(side=tk.LEFT, anchor=tk.W)
         self.exit_button = tk.Button(self.top_buttons_frame, text = "Exit", command = self.onExit)
         self.exit_button.pack(side=tk.LEFT, anchor=tk.W)
@@ -180,20 +180,27 @@ class SequenceApp():
         return
     
     def onLoad(self):
-        self.list_frame.refreshProject()
         self.option_frame.refreshProject()
+        self.refreshSequence()
         
     
     def onCreate(self):
+
         return
     
     def onInstrumentChange(self):
         self.option_frame.onChange()
+        self.refreshSequence()
         return
     
     def onRandom(self):
         self.datamodel.randomize()
+        self.refreshSequence()
+
+    def refreshSequence(self):
+        self.datamodel.refreshSequence()
         self.list_frame.refreshProject()
+
 
     
 
@@ -208,9 +215,22 @@ class SequenceApp():
             self.onLoad()
         return
     
+    def filemenu_create(self):
+        # filename = filedialog.asksaveasfile(parent=self.root_window, title="Open Sample List", filetypes=(("Excel Files", "*_SampleList.xlsx"),("All Files", "*.*")))
+        ###  Pass in sample list file name and sequence builder will replace filename and save next to it. 
+        filename = self.datamodel.sample_list_path_var.get()
+        print(filename)
+        if filename:
+            self.datamodel.onCreateSampleList(filename)
+        return
+
+    
     def createMenu(self):
 
-        self.filemenu_items = {'Open':self.filemenu_open}
+        self.filemenu_items = {
+            'Open':self.filemenu_open,
+            'Create_Sequence':self.filemenu_create
+            }
 
         self.menubar = Menu(self.root_window)
 
