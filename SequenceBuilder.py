@@ -53,7 +53,7 @@ class SequenceBuilder(object):
         if which is None:
             self.blank_count += 1
         return self.createLine(f"Blank_{which if which is not None else self.blank_count}", 
-                          f'R{self.blank_count}', 
+                          f'B{self.blank_count}', 
                           self.data_path, 
                           self.datamodel.getInstrumentData('methods')['blank'], 
                           'G1', 
@@ -72,7 +72,8 @@ class SequenceBuilder(object):
                           )
     
     def createPool(self):
-        return self.createLine(f'{self.project_name}_Pool_{self.pool_count}', 
+        self.pool_count += 1
+        return self.createLine(f'{self.datamodel.project_name}_Pool_{self.pool_count}', 
                           f'Pool_{self.pool_count}', 
                           self.data_path, 
                           self.datamodel.getOption('method'), 
@@ -110,6 +111,10 @@ class SequenceBuilder(object):
 
     
     def buildSequence(self):
+        self.pool_count = 0
+        self.blank_count = 0
+        self.rinse_count = 0
+        self.qc_count = 0
             
         self.data_path = "D:\\" + self.datamodel.project_name
         self.sequence = pd.DataFrame(
@@ -150,25 +155,41 @@ class SequenceBuilder(object):
 
         ###  pre-blank
         if self.datamodel.getOption('pre_blank'):
+            self.addToSequence(self.createRinse(which='pre'))
             self.addToSequence(self.createBlank(which='pre'))
         
         ###  pre-qc
         if self.datamodel.getOption('pre_qc'):
             self.addToSequence(self.createQC(which='pre'))
-            self.addToSequence(self.createBlank(which='pre-q'))
+            self.addToSequence(self.createRinse(which='pre-qc'))
+            self.addToSequence(self.createBlank(which='pre-qc'))
 
         ###  Samples       
         for i, s in enumerate(self.datamodel.sample_list):  ## sample_list will be randomized by datamodel if necessary
             self.addToSequence(self.createSample(s, i, positions[s]))
+            ### if time for pool
+            if(self.datamodel.getOption('pool')):
+                if i+1 == int(self.datamodel.sample_count * ((self.pool_count + 1) / 3)):
+                    self.addToSequence(self.createPool())
+            ### if time for extra blank
+            if int(self.datamodel.getOption('blank_every')) != 0:
+                if (i+1) % (int(self.datamodel.getOption('blank_every'))) == 0:
+                    self.addToSequence(self.createRinse())
+                    self.addToSequence(self.createBlank())
 
         ###  post-qc
         if self.datamodel.getOption('post_qc'):
+            self.addToSequence(self.createRinse(which='post-q'))            
             self.addToSequence(self.createBlank(which='post-q'))
             self.addToSequence(self.createQC(which='post'))
 
         ###  post-blank
         if self.datamodel.getOption('post_blank'):
+            self.addToSequence(self.createRinse(which='post'))
             self.addToSequence(self.createBlank(which='post'))
+
+        ###  end method
+        self.addToSequence(self.createEnd())
         
 
         return self.sequence
