@@ -199,9 +199,14 @@ class DataModel():
         if self.sample_count < 96:
             self.pool_vals = [i for i in self.pos_choices if i not in self.getSamplePositions()]
         else:
-            second_tray = 'B' if self.selected_tray == 'G' else 'G'
-            second_tray_list = self.datamodel.getTrayPositions(second_tray)
+            second_tray = 'B' if self.getOption('selected_tray') == 'G' else 'G'
+            second_tray_list = self.getTrayPositions(second_tray)
             self.pool_vals = [i for i in self.pos_choices + second_tray_list if i not in self.getSamplePositions()]
+
+            if self.sample_count >192:
+                third_tray = 'R'
+                third_tray_list = self.getTrayPositions(third_tray)
+                self.pool_vals = [i for i in self.pos_choices + second_tray_list + third_tray_list if i not in self.getSamplePositions()]
         # self.pool_combo.config(values = self.pool_vals)
         if self.getOption('pool_position') not in self.pool_vals:
             self.setOption('pool_position', self.pool_vals[-1])
@@ -220,6 +225,14 @@ class DataModel():
             second_tray_list = self.getTrayPositions(second_tray)
 
             pos_list = pos_list + second_tray_list
+        
+            if self.sample_count > 192:
+
+                third_tray = 'R'
+
+                third_tray_list = self.getTrayPositions(third_tray)
+
+                pos_list = pos_list + third_tray_list
         
         return pos_list[idx:idx+self.sample_count]
     

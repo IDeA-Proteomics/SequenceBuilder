@@ -44,7 +44,7 @@ class SequenceBuilder(object):
                           f'R{self.rinse_count}', 
                           self.data_path, 
                           self.datamodel.getInstrumentData('methods')['rinse'], 
-                          'G1', 
+                          self.datamodel.getInstrumentData('blank_loc'), 
                           str(self.datamodel.getInstrumentData('loop_vol')), 
                           f'Rinse_{which if which is not None else self.rinse_count}'
                           )
@@ -56,7 +56,7 @@ class SequenceBuilder(object):
                           f'B{self.blank_count}', 
                           self.data_path, 
                           self.datamodel.getInstrumentData('methods')['blank'], 
-                          'G1', 
+                          self.datamodel.getInstrumentData('blank_loc'), 
                           str(self.datamodel.getInstrumentData('loop_vol')), 
                           f'Blank_{which if which is not None else self.blank_count}'
                           )
@@ -66,7 +66,7 @@ class SequenceBuilder(object):
                           'E', 
                           self.data_path, 
                           self.datamodel.getInstrumentData('methods')['end'], 
-                          'G1', 
+                          self.datamodel.getInstrumentData('blank_loc'), 
                           str(self.datamodel.getInstrumentData('loop_vol')), 
                           "End"
                           )
@@ -89,7 +89,7 @@ class SequenceBuilder(object):
                             f'QC{self.qc_count}' if which is None else f'QC_{which}', 
                             self.data_path, 
                             self.datamodel.getInstrumentData('methods')['QC'],
-                            f"R{self.datamodel.getInstrumentData('tray_separator')}A1", 
+                            self.datamodel.getInstrumentData('qc_loc'), 
                             str(self.datamodel.getInstrumentData('loop_vol')), 
                             f'QC_{self.qc_count}' if which is None else f'QC_{which}'
                             )

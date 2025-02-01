@@ -14,7 +14,9 @@
         },
         "loop_vol": 10,
         "tray_separator": "",
-        "trays": ["R", "G", "B"]
+        "trays": ["R", "G", "B"],
+        "blank_loc": "G1",
+        "qc_loc": "RA1"
     },
     "Exploris2": {
         "name": "X2",
@@ -31,7 +33,9 @@
         },
         "loop_vol": 10,
         "tray_separator": "",
-        "trays": ["R", "G", "B"]
+        "trays": ["R", "G", "B"],
+        "blank_loc": "G1",
+        "qc_loc": "RA1"
     },
     "Eclipse1": {
         "name": "E1",
@@ -45,7 +49,9 @@
         },
         "loop_vol": 20,
         "tray_separator": "",
-        "trays": ["R", "G", "B"]
+        "trays": ["R", "G", "B"],
+        "blank_loc": "G1",
+        "qc_loc": "RA1"
     },
     "Eclipse2": {
         "name": "E2",
@@ -63,7 +69,9 @@
         },
         "loop_vol": 20,
         "tray_separator": "",
-        "trays": ["R", "G", "B"]
+        "trays": ["R", "G", "B"],
+        "blank_loc": "G1",
+        "qc_loc": "RA1"
     },
     "Fusion1": {
         "name": "F1",
@@ -79,7 +87,9 @@
         },
         "loop_vol": 20,
         "tray_separator": "",
-        "trays": ["R", "G", "B"]
+        "trays": ["R", "G", "B"],
+        "blank_loc": "G1",
+        "qc_loc": "RA1"
     },
     "Fusion2": {
         "name": "F2",
@@ -95,25 +105,28 @@
         },
         "loop_vol": 20,
         "tray_separator": "",
-        "trays": ["R", "G", "B"]
+        "trays": ["R", "G", "B"],
+        "blank_loc": "G1",
+        "qc_loc": "RA1"
     },
     "Astral": {
         "name": "A1",
         "methods": {
             "DDA": [
-                "C:\\Xcalibur\\methods\\Astral_60min_10uL_041024_uL_pickup"
             ],
             "DIA": [
-                "C:\\Xcalibur\\methods\\Astral_DIA_20min_041024_uL_pickup",
-                "C:\\Xcalibur\\methods\\Astral_DIA_40min_041024_uL_pickup"
+                "C:\\Xcalibur\\methods\\Current\\25cm_40min_350nl_cycle_HCD25_IW4_112724",
+                "C:\\Xcalibur\\methods\\Current\\25cm_20min_350nl_cycle_HCD25_IW3_010925"
             ],
-            "QC": "C:\\Xcalibur\\methods\\Astral_60min_10uL_041024_uL_pickup",
-            "blank": "C:\\Xcalibur\\methods\\Astral_60min_10uL_041024_uL_pickup",
-            "rinse": "C:\\Xcalibur\\methods\\Astral_Sawtooth_60min_050622",
-            "end": "C:\\Xcalibur\\methods\\Astral_60min_10uL_011323_end_on_80percent"
+            "QC": "C:\\Xcalibur\\methods\\Current\\25cm_40min_350nl_cycle_HCD25_IW4_112724",
+            "blank": "C:\\Xcalibur\\methods\\Current\\25cm_40min_350nl_cycle_HCD25_IW4_112724",
+            "rinse": "C:\\Xcalibur\\methods\\Current\\SawtoothRinse_25cm_20min_350nl_cycle_HCD25_IW7_112224",
+            "end": "C:\\Xcalibur\\methods\\Current\\25cm_20min_350nl_end90_negative"
         },
-        "loop_vol": 10,
+        "loop_vol": 20,
         "tray_separator": ":",
-        "trays": ["R", "G", "B", "Y"]
+        "trays": ["R", "G", "B", "Y"],
+        "blank_loc": "Y:A3",
+        "qc_loc": "Y:A4"
     }
 }
