@@ -59,7 +59,6 @@ class DataModel():
         return
     
     def onCreateSampleList(self, file_name):
-        print(file_name)
         self.sequence_builder.outputSequence(file_name)
         return
     
@@ -106,6 +105,12 @@ class DataModel():
     # @property
     # def sample_method(self):
     #     return self.getOption('method')
+
+    @property
+    def sample_list_path(self):
+        if self.project_loaded:
+            return self.sample_list_path_var.get()
+        return None
 
     @property
     def sorted_list(self):

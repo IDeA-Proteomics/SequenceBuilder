@@ -216,12 +216,16 @@ class SequenceApp():
         return
     
     def filemenu_create(self):
-        # filename = filedialog.asksaveasfile(parent=self.root_window, title="Open Sample List", filetypes=(("Excel Files", "*_SampleList.xlsx"),("All Files", "*.*")))
+        dname = os.path.dirname(self.datamodel.sample_list_path)
+        fname = "{}_Injection_Sequence.csv".format(self.datamodel.project_name)
+        filename = filedialog.asksaveasfilename(parent=self.root_window, title="Open Sample List", initialdir=dname, initialfile=fname,filetypes=(("Excel Files", "*_SampleList.xlsx"),("All Files", "*.*")))
+        if not filename:
+            print ("Cancelled:")
+            return
         ###  Pass in sample list file name and sequence builder will replace filename and save next to it. 
-        filename = self.datamodel.sample_list_path_var.get()
+        # filename = self.datamodel.sample_list_path_var.get()
         print(filename)
-        if filename:
-            self.datamodel.onCreateSampleList(filename)
+        self.datamodel.onCreateSampleList(filename)
         return
 
     
