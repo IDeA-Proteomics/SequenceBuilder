@@ -96,7 +96,7 @@ class SequenceBuilder(object):
 
     
     def createSample(self, sample_name, sample_number, position):
-        return self.createLine(f"{self.datamodel.project_name}_{str(sample_name)}", 
+        return self.createLine(f"{str(sample_name)}", 
                             str(sample_number), 
                             self.data_path, 
                             self.datamodel.getOption('method'),
