@@ -16,7 +16,8 @@
         "tray_separator": "",
         "trays": ["R", "G", "B"],
         "blank_loc": "G1",
-        "qc_loc": "RA1"
+        "qc_loc": "RA1",
+        "qc_path": "D:\\QC"
     },
     "Exploris2": {
         "name": "X2",
@@ -35,7 +36,8 @@
         "tray_separator": "",
         "trays": ["R", "G", "B"],
         "blank_loc": "G1",
-        "qc_loc": "RA1"
+        "qc_loc": "RA1",
+        "qc_path": "D:\\QC"
     },
     "Eclipse1": {
         "name": "E1",
@@ -51,7 +53,8 @@
         "tray_separator": "",
         "trays": ["R", "G", "B"],
         "blank_loc": "G1",
-        "qc_loc": "RA1"
+        "qc_loc": "RA1",
+        "qc_path": "D:\\QC"
     },
     "Eclipse2": {
         "name": "E2",
@@ -71,7 +74,8 @@
         "tray_separator": "",
         "trays": ["R", "G", "B"],
         "blank_loc": "G1",
-        "qc_loc": "RA1"
+        "qc_loc": "RA1",
+        "qc_path": "D:\\QC"
     },
     "Fusion1": {
         "name": "F1",
@@ -89,7 +93,8 @@
         "tray_separator": "",
         "trays": ["R", "G", "B"],
         "blank_loc": "G1",
-        "qc_loc": "RA1"
+        "qc_loc": "RA1",
+        "qc_path": "D:\\QC"
     },
     "Fusion2": {
         "name": "F2",
@@ -107,7 +112,8 @@
         "tray_separator": "",
         "trays": ["R", "G", "B"],
         "blank_loc": "G1",
-        "qc_loc": "RA1"
+        "qc_loc": "RA1",
+        "qc_path": "D:\\QC"
     },
     "Astral": {
         "name": "A1",
@@ -127,6 +133,7 @@
         "tray_separator": ":",
         "trays": ["R", "G", "B", "Y"],
         "blank_loc": "Y:A3",
-        "qc_loc": "Y:A4"
+        "qc_loc": "Y:A4",
+        "qc_path": "D:\\QC"
     }
 }

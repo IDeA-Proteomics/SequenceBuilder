@@ -87,7 +87,7 @@ class SequenceBuilder(object):
             self.qc_count += 1
         return self.createLine("QC_"+ self.datamodel.getInstrumentData('name') +"_JJN3_iRT_" + ("pre_" if which == "pre" else "post_" if which == "post" else ('mid_' + str(self.qc_count) + '_')) + self.datamodel.project_name + "_DDA", 
                             f'QC{self.qc_count}' if which is None else f'QC_{which}', 
-                            self.data_path, 
+                            self.datamodel.getInstrumentData('qc_path'), 
                             self.datamodel.getInstrumentData('methods')['QC'],
                             self.datamodel.getInstrumentData('qc_loc'), 
                             str(self.datamodel.getInstrumentData('loop_vol')), 
