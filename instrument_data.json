@@ -42,12 +42,12 @@
     "Eclipse1": {
         "name": "E1",
         "methods": {
-            "DDA": [],
+            "DDA": ["C:\\Xcalibur\\methods\\HCD_60minLCMSMS_uLpickup_010523"],
             "DIA": [],
-            "QC": "",
-            "blank": "",
-            "rinse": "",
-            "end": ""
+            "QC": "C:\\Xcalibur\\methods\\HCD_60minLCMSMS_uLpickup_010523",
+            "blank": "C:\\Xcalibur\\methods\\HCD_60minLCMSMS_uLpickup_010523",
+            "rinse": "C:\\Xcalibur\\methods\\sawtooth_30min_042722",
+            "end": "C:\\Xcalibur\\methods\\sawtooth_30min_042722"
         },
         "loop_vol": 20,
         "tray_separator": "",
