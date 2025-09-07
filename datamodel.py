@@ -164,7 +164,7 @@ class DataModel():
 
     @property
     def instrument_list(self):
-        return self.instrument_data.keys()
+        return list(self.instrument_data.keys())
 
     def getInstrumentData(self, key):
         return self.instrument_data[self.getOption('instrument')][key]

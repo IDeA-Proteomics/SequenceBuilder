@@ -3,6 +3,8 @@ from tkinter import ttk, messagebox, filedialog
 import openpyxl
 from datamodel import DataModel
 
+from SequenceWidgets import TrayPicker
+
 #################################################################
 #############################################################
 #####    Helper to keep popups centered and looking nice
@@ -160,6 +162,68 @@ class EditMethodsDialog(tk.Toplevel):
         return
 
 
+class SettingsDialog(tk.Toplevel):
+    def __init__(self, parent: tk.Misc, datamodel: DataModel):
+        super().__init__(parent)
+        self.parent = parent
+        self.datamodel = datamodel
+        self.title("Settings")
+
+        self.settings = datamodel.settings
+
+        self.container = tk.Frame(self)
+        self.container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        ####   Default Tray
+
+        self.default_tray_frame = tk.Frame(self.container)   
+        self.default_tray_frame.pack(side=tk.TOP, fill=tk.X, pady=5)
+
+        self.default_tray_label = tk.Label(self.default_tray_frame, text="Default Tray:")
+        self.default_tray_label.pack(side=tk.TOP)
+
+        self.default_tray_var = tk.StringVar(value=self.settings.default_tray)
+        self.default_tray_picker = TrayPicker(self.default_tray_frame, textvariable=self.default_tray_var, onChange=None, initial_val=self.settings.default_tray)     
+        self.default_tray_picker.pack(side=tk.TOP)
+
+        ####  Default Instrument
+
+        self.default_instrument_frame = tk.Frame(self.container)   
+        self.default_instrument_frame.pack(side=tk.TOP, fill=tk.X, pady=5)
+
+        self.default_instrument_label = tk.Label(self.default_instrument_frame, text="Default Instrument:")
+        self.default_instrument_label.pack(side=tk.TOP)
+
+        self.default_instrument_var = tk.StringVar(value=self.settings.default_instrument)
+        self.default_instrument_combo = ttk.Combobox(self.default_instrument_frame, textvariable=self.default_instrument_var, values=self.datamodel.instrument_list, state='readonly', width=20)
+        self.default_instrument_combo.pack(side=tk.TOP)
+
+        ###  Buttons
+
+        self.button_frame = tk.Frame(self.container)
+        self.button_frame.pack(side=tk.TOP, fill=tk.X, pady=10)
+
+        self.applyButton = tk.Button(self.button_frame, text="Apply", command=self.onDone)
+        self.applyButton.pack(side=tk.LEFT, padx=5)
+
+        self.cancelButton = tk.Button(self.button_frame, text="Cancel", command=self.onCancel)
+        self.cancelButton.pack(side=tk.LEFT, padx=5)
+
+        show_modal_centered(self, parent)
+        self.wait_window()
+
+        return
+    
+    def onDone(self):
+        self.settings.default_tray = self.default_tray_var.get()
+        self.settings.default_instrument = self.default_instrument_var.get()
+        self.datamodel.settings.saveToFile()
+        self.destroy()
+        return
+    
+    def onCancel(self):
+        self.destroy()
+        return
 
 #########
         ##   Old Exception Handlers from the old version for dealing with Sample List issues
