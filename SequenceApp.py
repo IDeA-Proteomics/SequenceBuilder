@@ -5,6 +5,7 @@ from tkinter import messagebox, filedialog, Menu
 from datamodel import *
 from SequenceWidgets import *
 from OptionFrame import *
+from popups import EditMethodsDialog
 
 
 frame_options = {'highlightbackground':'black' , 'highlightthickness':1}
@@ -227,6 +228,15 @@ class SequenceApp():
         print(filename)
         self.datamodel.onCreateSampleList(filename)
         return
+    
+    def editmenu_edit_methods(self):
+        dlg = EditMethodsDialog(self.root_window, self.datamodel)
+        if dlg.result is not None:
+            print (dlg.result)
+            self.datamodel.instrument_data[self.datamodel.getOption('instrument')]['methods'][self.datamodel.getOption('diadda')] = dlg.result
+            self.datamodel.save_instrument_data()
+            self.instrument_frame.onInstrumentChange()
+        return
 
     
     def createMenu(self):
@@ -235,6 +245,10 @@ class SequenceApp():
             'Open':self.filemenu_open,
             'Create_Sequence':self.filemenu_create
             }
+        
+        self.editmenu_items = {
+            'Edit Methods':self.editmenu_edit_methods
+            }
 
         self.menubar = Menu(self.root_window)
 
@@ -242,7 +256,12 @@ class SequenceApp():
         for k,v in self.filemenu_items.items():
             self.filemenu.add_command(label=k, command=v)
 
+        self.editmenu = Menu(self.menubar, tearoff=0)
+        for k,v in self.editmenu_items.items():
+            self.editmenu.add_command(label=k, command=v)
+
         self.menubar.add_cascade(label="File", menu=self.filemenu)
+        self.menubar.add_cascade(label="Edit", menu=self.editmenu)
 
         self.root_window.config(menu=self.menubar)
 

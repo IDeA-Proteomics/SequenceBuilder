@@ -17,8 +17,7 @@ class DataModel():
         self.row_labels = "ABCDEFGH"
         # self.position_list = [f"{a}{b}{c}" for a in "RGB" for b in "ABCDEFGH" for c in range(1, 13)]
         self.instrument_data = {}
-        with open("instrument_data.json") as jf:
-            self.instrument_data = json.load(jf)
+        self.load_instrument_data()
 
         self.list_reader = None
         self.sample_frame = None
@@ -58,6 +57,17 @@ class DataModel():
 
 
         return
+    
+    def load_instrument_data(self):
+        with open("instrument_data.json") as jf:
+            self.instrument_data = json.load(jf)
+        return
+    
+    def save_instrument_data(self):
+        with open("instrument_data.json", 'w') as jf:
+            json.dump(self.instrument_data, jf, indent=4)
+        return
+
     
     def onCreateSampleList(self, file_name):
         self.sequence_builder.outputSequence(file_name)
