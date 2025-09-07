@@ -5,6 +5,7 @@ from idea_utils import SampleListReader
 
 import pandas as pd
 import tkinter as tk
+from tkinter import messagebox
 import json
 
 class DataModel():
@@ -63,7 +64,11 @@ class DataModel():
         return
     
     def openSampleList(self, file_name):
-        self.list_reader = SampleListReader.SampleListReader(file_name)
+        try:
+            self.list_reader = SampleListReader.SampleListReader(file_name)
+        except Exception as e:
+            messagebox.showerror("Error", f"Error loading sample list: \n\n{e}")
+            return
         self.sample_list_path_var.set(self.list_reader.path)
         self.project_name_var.set(self.list_reader.project_name)
         ## save original order 
