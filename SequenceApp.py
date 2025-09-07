@@ -29,7 +29,7 @@ class HeaderFrame(tk.Frame):
     
 class InstrumentFrame(tk.Frame):
 
-    def __init__(self, parent, datamodel, onChange = None):
+    def __init__(self, parent, datamodel, onChange = None, onEdit=None):
 
         self.parent = parent
         self.datamodel = datamodel
@@ -47,6 +47,9 @@ class InstrumentFrame(tk.Frame):
         self.dia_button = tk.Radiobutton(self.top_frame, text="DIA", var=datamodel.getOptionVar('diadda'), value="DIA", command=self.onInstrumentChange)
         self.dda_button.pack(side=tk.LEFT, anchor=tk.E)
         self.dia_button.pack(side=tk.LEFT, anchor=tk.E)
+
+        self.edit_methods_button = tk.Button(self.top_frame, text="Edit Method List", command=onEdit)
+        self.edit_methods_button.pack(side=tk.LEFT, anchor=tk.E, padx=30)
 
         self.method_combo = ttk.Combobox(self, textvariable=self.datamodel.getOptionVar('method'), values=self.datamodel.method_list, state='readonly', width=100)
         self.method_combo.pack(side=tk.TOP, anchor=tk.E)
@@ -162,7 +165,7 @@ class SequenceApp():
         self.option_frame = OptionFrame(self.right_frame, self.datamodel, onStartChange=self.refreshSequence, onRandom=self.onRandom)
         self.option_frame.pack(side=tk.TOP)
 
-        self.instrument_frame = InstrumentFrame(self.top_frame, self.datamodel, self.onInstrumentChange)
+        self.instrument_frame = InstrumentFrame(self.top_frame, self.datamodel, self.onInstrumentChange, self.editmenu_edit_methods)
         self.instrument_frame.pack(side=tk.RIGHT, anchor=tk.E)
 
         self.open_button = tk.Button(self.top_buttons_frame, text="Open Sample List", command=self.filemenu_open)
@@ -232,7 +235,6 @@ class SequenceApp():
     def editmenu_edit_methods(self):
         dlg = EditMethodsDialog(self.root_window, self.datamodel)
         if dlg.result is not None:
-            print (dlg.result)
             self.datamodel.instrument_data[self.datamodel.getOption('instrument')]['methods'][self.datamodel.getOption('diadda')] = dlg.result
             self.datamodel.save_instrument_data()
             self.instrument_frame.onInstrumentChange()
