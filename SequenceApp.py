@@ -5,7 +5,7 @@ from tkinter import messagebox, filedialog, Menu
 from datamodel import *
 from SequenceWidgets import *
 from OptionFrame import *
-from popups import EditMethodsDialog, SettingsDialog, InstrumentSettingsDialog
+from popups import SettingsDialog, InstrumentSettingsDialog
 
 
 frame_options = {'highlightbackground':'black' , 'highlightthickness':1}
@@ -165,7 +165,7 @@ class SequenceApp():
         self.option_frame = OptionFrame(self.right_frame, self.datamodel, onStartChange=self.refreshSequence, onRandom=self.onRandom)
         self.option_frame.pack(side=tk.TOP)
 
-        self.instrument_frame = InstrumentFrame(self.top_frame, self.datamodel, self.onInstrumentChange, self.editmenu_edit_methods)
+        self.instrument_frame = InstrumentFrame(self.top_frame, self.datamodel, self.onInstrumentChange, self.editmenu_instrument_settings)
         self.instrument_frame.pack(side=tk.RIGHT, anchor=tk.E)
 
         self.open_button = tk.Button(self.top_buttons_frame, text="Open Sample List", command=self.filemenu_open)
@@ -232,13 +232,13 @@ class SequenceApp():
         self.datamodel.onCreateSampleList(filename)
         return
     
-    def editmenu_edit_methods(self):
-        dlg = EditMethodsDialog(self.root_window, self.datamodel)
-        if dlg.result is not None:
-            self.datamodel.instrument_data[self.datamodel.getOption('instrument')]['methods'][self.datamodel.getOption('diadda')] = dlg.result
-            self.datamodel.save_instrument_data()
-            self.instrument_frame.onInstrumentChange()
-        return
+    # def editmenu_edit_methods(self):
+    #     dlg = EditMethodsDialog(self.root_window, self.datamodel)
+    #     if dlg.result is not None:
+    #         self.datamodel.instrument_data[self.datamodel.getOption('instrument')]['methods'][self.datamodel.getOption('diadda')] = dlg.result
+    #         self.datamodel.save_instrument_data()
+    #         self.instrument_frame.onInstrumentChange()
+    #     return
     
     def editmenu_settings(self):
         dlg = SettingsDialog(self.root_window, self.datamodel)
@@ -248,6 +248,7 @@ class SequenceApp():
     def editmenu_instrument_settings(self):
         dlg = InstrumentSettingsDialog(self.root_window, self.datamodel)
         self.onInstrumentChange()
+        self.instrument_frame.onInstrumentChange()
         return
 
     
@@ -259,7 +260,7 @@ class SequenceApp():
             }
         
         self.editmenu_items = {
-            'Edit Methods':self.editmenu_edit_methods,
+            # 'Edit Methods':self.editmenu_edit_methods,
             'Settings':self.editmenu_settings,
             'Instrument Settings':self.editmenu_instrument_settings
             }

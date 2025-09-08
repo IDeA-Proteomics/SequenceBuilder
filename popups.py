@@ -67,30 +67,23 @@ def show_modal_centered(win: tk.Toplevel, master: tk.Misc, *, topmost_pulse: boo
         pass
 
 
-class EditMethodsDialog(tk.Toplevel):
-    def __init__(self, parent: tk.Misc, datamodel: DataModel):
+class EditMethodsFrame(tk.Frame):
+    def __init__(self, parent, key, methods):
         super().__init__(parent)
         self.parent = parent
-        self.datamodel = datamodel
-        self.title("Edit Method List")
+        self.key = key
+        self.methods = methods
+        self.var = tk.StringVar(value=self.methods)
 
-        self.result = None  # Will hold the updated list of methods or None if cancelled
+        self.label_text = "DDA" if key == 'DDA' else "DIA" if key == 'DIA' else "ERROR"
 
-        ###  A list of the methods available for the selected instrument
-        self.methods = self.datamodel.getInstrumentData('methods')[self.datamodel.getOption('diadda')]
-
-        self.methodsVar = tk.StringVar(value=self.methods)
-
-        self.container = tk.Frame(self)
-        self.container.pack(fill=tk.BOTH, expand=True)
-
-        self.listFrame = tk.Frame(self.container)
+        self.listFrame = tk.Frame(self)
         self.listFrame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        self.buttonFrame = tk.Frame(self.container)
+        self.buttonFrame = tk.Frame(self)
         self.buttonFrame.pack(side=tk.LEFT, fill=tk.Y)
 
-        self.listbox = tk.Listbox(self.listFrame, listvariable=self.methodsVar, selectmode=tk.SINGLE, height=10, width=50)
+        self.listbox = tk.Listbox(self.listFrame, listvariable=self.var, selectmode=tk.SINGLE, height=10, width=130)
         self.listbox.pack()
 
         self.addButton = tk.Button(self.buttonFrame, text="Add", command=self.addMethod)
@@ -103,24 +96,15 @@ class EditMethodsDialog(tk.Toplevel):
         self.upButton.pack(fill=tk.X)
 
         self.downButton = tk.Button(self.buttonFrame, text="Down", command=self.moveDown)
-        self.downButton.pack(fill=tk.X)      
-
-        self.doneButton = tk.Button(self.buttonFrame, text="Done", command=self.onDone)
-        self.doneButton.pack(fill=tk.X) 
-
-        self.cancelButton = tk.Button(self.buttonFrame, text="Cancel", command=self.onCancel)
-        self.cancelButton.pack(fill=tk.X)   
-
-        show_modal_centered(self, parent)
-        self.wait_window()
+        self.downButton.pack(fill=tk.X)    
 
         return
-    
+
     def addMethod(self):
         method_path = filedialog.askopenfilename(parent=self, title="Select Method File", filetypes=[("Method Files", "*.meth"), ("All Files", "*.*")])
         if method_path:
             self.methods.append(method_path)
-            self.methodsVar.set(self.methods)
+            self.var.set(self.methods)
         return
     
     def removeMethod(self):
@@ -128,7 +112,7 @@ class EditMethodsDialog(tk.Toplevel):
         if sel:
             index = sel[0]
             del self.methods[index]
-            self.methodsVar.set(self.methods)
+            self.var.set(self.methods)
         return
     
     def moveUp(self):
@@ -137,7 +121,7 @@ class EditMethodsDialog(tk.Toplevel):
             index = sel[0]
             if index > 0:
                 self.methods[index], self.methods[index - 1] = self.methods[index - 1], self.methods[index]
-                self.methodsVar.set(self.methods)
+                self.var.set(self.methods)
                 self.listbox.selection_set(index - 1)
         return  
     
@@ -147,19 +131,10 @@ class EditMethodsDialog(tk.Toplevel):
             index = sel[0]
             if index < len(self.methods) - 1:
                 self.methods[index], self.methods[index + 1] = self.methods[index + 1], self.methods[index]
-                self.methodsVar.set(self.methods)
+                self.var.set(self.methods)
                 self.listbox.selection_set(index + 1)
         return  
-    
-    def onDone(self):
-        self.result = self.methods
-        self.destroy()
-        return
-    
-    def onCancel(self):
-        self.result = None
-        self.destroy()
-        return
+
 
 
 class SettingsDialog(tk.Toplevel):
@@ -282,6 +257,8 @@ class InstrumentSettingsDialog(tk.Toplevel):
         if instrument in self.current_settings:
             settings = self.current_settings[instrument]
 
+            settings['methods']['DDA'] = self.dda_methods
+            settings['methods']['DIA'] = self.dia_methods
             settings['methods']['QC'] = self.qc_var.get()
             settings['methods']['blank'] = self.blank_var.get()
             settings['methods']['rinse'] = self.rinse_var.get()
@@ -309,6 +286,21 @@ class InstrumentSettingsDialog(tk.Toplevel):
         instrument = self.instrument_var.get()
         if instrument in self.current_settings:
             settings = self.current_settings[instrument]
+
+        self.dda_label = tk.Label(self.settings_frame, text="DDA Methods:")
+        self.dda_label.pack(fill=tk.X, pady=5)
+        self.dda_methods = settings['methods']['DDA']
+        # self.dda_var = tk.StringVar(value=self.dda_methods)
+        self.dda_selector = EditMethodsFrame(self.settings_frame, "DDA", self.dda_methods)
+        self.dda_selector.pack(fill=tk.X, pady=5)
+
+        
+        self.dia_label = tk.Label(self.settings_frame, text="DIA Methods:")
+        self.dia_label.pack(fill=tk.X, pady=5)
+        self.dia_methods = settings['methods']['DIA']
+        # self.dia_var = tk.StringVar(value=self.dia_methods)
+        self.dia_selector = EditMethodsFrame(self.settings_frame, "DIA", self.dia_methods)
+        self.dia_selector.pack(fill=tk.X, pady=5)
 
         self.qc_var = tk.StringVar(value=settings['methods']['QC'])
         self.qc_selector = self.methodSelector(self.settings_frame, "QC Method:", 'QC', self.qc_var)
@@ -355,6 +347,101 @@ class InstrumentSettingsDialog(tk.Toplevel):
 
         return frame
 
+
+
+# class EditMethodsDialog(tk.Toplevel):
+#     def __init__(self, parent: tk.Misc, datamodel: DataModel):
+#         super().__init__(parent)
+#         self.parent = parent
+#         self.datamodel = datamodel
+#         self.title("Edit Method List")
+
+#         self.result = None  # Will hold the updated list of methods or None if cancelled
+
+#         ###  A list of the methods available for the selected instrument
+#         self.methods = self.datamodel.getInstrumentData('methods')[self.datamodel.getOption('diadda')]
+
+#         self.methodsVar = tk.StringVar(value=self.methods)
+
+#         self.container = tk.Frame(self)
+#         self.container.pack(fill=tk.BOTH, expand=True)
+
+#         self.listFrame = tk.Frame(self.container)
+#         self.listFrame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+#         self.buttonFrame = tk.Frame(self.container)
+#         self.buttonFrame.pack(side=tk.LEFT, fill=tk.Y)
+
+#         self.listbox = tk.Listbox(self.listFrame, listvariable=self.methodsVar, selectmode=tk.SINGLE, height=10, width=50)
+#         self.listbox.pack()
+
+#         self.addButton = tk.Button(self.buttonFrame, text="Add", command=self.addMethod)
+#         self.addButton.pack(fill=tk.X)
+
+#         self.removeButton = tk.Button(self.buttonFrame, text="Remove", command=self.removeMethod)
+#         self.removeButton.pack(fill=tk.X)  
+
+#         self.upButton = tk.Button(self.buttonFrame, text="Up", command=self.moveUp)
+#         self.upButton.pack(fill=tk.X)
+
+#         self.downButton = tk.Button(self.buttonFrame, text="Down", command=self.moveDown)
+#         self.downButton.pack(fill=tk.X)      
+
+#         self.doneButton = tk.Button(self.buttonFrame, text="Done", command=self.onDone)
+#         self.doneButton.pack(fill=tk.X) 
+
+#         self.cancelButton = tk.Button(self.buttonFrame, text="Cancel", command=self.onCancel)
+#         self.cancelButton.pack(fill=tk.X)   
+
+#         show_modal_centered(self, parent)
+#         self.wait_window()
+
+#         return
+    
+#     def addMethod(self):
+#         method_path = filedialog.askopenfilename(parent=self, title="Select Method File", filetypes=[("Method Files", "*.meth"), ("All Files", "*.*")])
+#         if method_path:
+#             self.methods.append(method_path)
+#             self.methodsVar.set(self.methods)
+#         return
+    
+#     def removeMethod(self):
+#         sel = self.listbox.curselection()
+#         if sel:
+#             index = sel[0]
+#             del self.methods[index]
+#             self.methodsVar.set(self.methods)
+#         return
+    
+#     def moveUp(self):
+#         sel = self.listbox.curselection()
+#         if sel:
+#             index = sel[0]
+#             if index > 0:
+#                 self.methods[index], self.methods[index - 1] = self.methods[index - 1], self.methods[index]
+#                 self.methodsVar.set(self.methods)
+#                 self.listbox.selection_set(index - 1)
+#         return  
+    
+#     def moveDown(self):
+#         sel = self.listbox.curselection()
+#         if sel:
+#             index = sel[0]
+#             if index < len(self.methods) - 1:
+#                 self.methods[index], self.methods[index + 1] = self.methods[index + 1], self.methods[index]
+#                 self.methodsVar.set(self.methods)
+#                 self.listbox.selection_set(index + 1)
+#         return  
+    
+#     def onDone(self):
+#         self.result = self.methods
+#         self.destroy()
+#         return
+    
+#     def onCancel(self):
+#         self.result = None
+#         self.destroy()
+#         return
 
 #########
         ##   Old Exception Handlers from the old version for dealing with Sample List issues
