@@ -95,13 +95,14 @@ class SequenceBuilder(object):
                             )
 
     
-    def createSample(self, sample_name, sample_number, position):
+    def createSample(self, sample_name, sample_number, position, volume=None):
+        volume = volume if volume is not None else self.datamodel.getInstrumentData('loop_vol')
         return self.createLine(f"{str(sample_name)}", 
                             str(sample_number), 
                             self.data_path, 
                             self.datamodel.getOption('method'),
                             position, 
-                            str(self.datamodel.getInstrumentData('loop_vol')), 
+                            str(volume), 
                             str(sample_name)
                             )
 
@@ -151,7 +152,7 @@ class SequenceBuilder(object):
         ###  Check for test sample and add it
         ts = self.datamodel.getOption('test_sample')                
         if ts != "None":
-            self.addToSequence(self.createSample(ts+'_TEST', 'T', positions[ts]))
+            self.addToSequence(self.createSample(ts+'_TEST', 'T', positions[ts], 2.0))
 
         ###  pre-blank
         if self.datamodel.getOption('pre_blank'):
