@@ -5,7 +5,7 @@ from tkinter import messagebox, filedialog, Menu
 from datamodel import *
 from SequenceWidgets import *
 from OptionFrame import *
-from popups import EditMethodsDialog, SettingsDialog
+from popups import EditMethodsDialog, SettingsDialog, InstrumentSettingsDialog
 
 
 frame_options = {'highlightbackground':'black' , 'highlightthickness':1}
@@ -244,6 +244,11 @@ class SequenceApp():
         dlg = SettingsDialog(self.root_window, self.datamodel)
 
         return
+    
+    def editmenu_instrument_settings(self):
+        dlg = InstrumentSettingsDialog(self.root_window, self.datamodel)
+        self.onInstrumentChange()
+        return
 
     
     def createMenu(self):
@@ -256,6 +261,7 @@ class SequenceApp():
         self.editmenu_items = {
             'Edit Methods':self.editmenu_edit_methods,
             'Settings':self.editmenu_settings,
+            'Instrument Settings':self.editmenu_instrument_settings
             }
 
         self.menubar = Menu(self.root_window)

@@ -225,6 +225,137 @@ class SettingsDialog(tk.Toplevel):
         self.destroy()
         return
 
+
+
+class InstrumentSettingsDialog(tk.Toplevel):
+    def __init__(self, parent: tk.Misc, datamodel: DataModel):
+        super().__init__(parent)
+        self.parent = parent
+        self.datamodel = datamodel
+        self.title("Instrument Settings")
+
+        self.current_settings = self.datamodel.instrument_data
+
+        self.container = tk.Frame(self)
+        self.container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        self.instrument_frame = tk.Frame(self.container)
+        self.instrument_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        ####   Instrument Selection
+        instrument_list = list(self.current_settings.keys())
+        self.instrument_var = tk.StringVar(value=self.datamodel.getOption('instrument'))
+        self.instrument_label = tk.Label(self.instrument_frame, text="Select Instrument:")
+        self.instrument_label.grid(row=0, column=0, sticky=tk.W, pady=5)
+        self.instrument_combo = ttk.Combobox(self.instrument_frame, textvariable=self.instrument_var, values=instrument_list, state='readonly', width=30)
+        self.instrument_combo.grid(row=0, column=1, sticky=tk.W, pady=5)
+        self.instrument_combo.bind("<<ComboboxSelected>>", self.onInstrumentChange)
+
+        self.settings_frame = tk.Frame(self.container)
+        self.settings_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        self.buildSettingsFrame()
+
+        self.buttons_frame = tk.Frame(self.container)
+        self.buttons_frame.pack(side=tk.TOP, fill=tk.X, pady=10)
+
+        self.apply_all_button = tk.Button(self.buttons_frame, text="Apply Forever", command=self.applyAll)
+        self.apply_all_button.pack(side=tk.LEFT, padx=5)
+
+        self.apply_button = tk.Button(self.buttons_frame, text="Apply Current", command=self.applyCurrent)
+        self.apply_button.pack(side=tk.LEFT, padx=5)
+
+        self.cancel_button = tk.Button(self.buttons_frame, text="Cancel", command=self.onCancel)
+        self.cancel_button.pack(side=tk.LEFT, padx=5)
+
+        show_modal_centered(self, parent)
+        self.wait_window()
+
+        return
+    
+    def onInstrumentChange(self, event):
+        self.buildSettingsFrame()
+        return
+    
+    def applyCurrent(self):
+        instrument = self.instrument_var.get()
+        if instrument in self.current_settings:
+            settings = self.current_settings[instrument]
+
+            settings['methods']['QC'] = self.qc_var.get()
+            settings['methods']['blank'] = self.blank_var.get()
+            settings['methods']['rinse'] = self.rinse_var.get()
+            settings['methods']['end'] = self.end_var.get()
+
+            # Save back to datamodel
+            self.datamodel.instrument_data[instrument] = settings
+        self.destroy()
+        return
+    
+    def applyAll(self):
+        self.applyCurrent()
+        self.datamodel.save_instrument_data()
+        # self.destroy()
+        return
+    
+    def onCancel(self):
+        self.destroy()
+        return
+    
+    def buildSettingsFrame(self):
+        for widget in self.settings_frame.winfo_children():
+            widget.destroy()
+
+        instrument = self.instrument_var.get()
+        if instrument in self.current_settings:
+            settings = self.current_settings[instrument]
+
+        self.qc_var = tk.StringVar(value=settings['methods']['QC'])
+        self.qc_selector = self.methodSelector(self.settings_frame, "QC Method:", 'QC', self.qc_var)
+        self.qc_selector.pack(fill=tk.X, pady=5)
+
+        self.blank_var = tk.StringVar(value=settings['methods']['blank'])
+        self.blank_selector = self.methodSelector(self.settings_frame, "Blank Method:", 'blank', self.blank_var)
+        self.blank_selector.pack(fill=tk.X, pady=5)
+
+        self.rinse_var = tk.StringVar(value=settings['methods']['rinse'])
+        self.rinse_selector = self.methodSelector(self.settings_frame, "Rinse Method:", 'rinse', self.rinse_var)
+        self.rinse_selector.pack(fill=tk.X, pady=5)  
+
+        self.end_var = tk.StringVar(value=settings['methods']['end'])
+        self.end_selector = self.methodSelector(self.settings_frame, "End Method:", 'end', self.end_var)
+        self.end_selector.pack(fill=tk.X, pady=5)
+
+        return
+
+    
+    def methodSelector(self, parent, label_text, key, var):
+
+        ####  sample methods go by a different widget
+        if key == 'DDA' or key == 'DIA':
+            return
+
+        frame = tk.Frame(parent)
+        frame.pack(fill=tk.X, pady=5)
+
+        label = tk.Label(frame, text=label_text)
+        label.pack(side=tk.LEFT)
+
+        entry = tk.Entry(frame, textvariable=var, width=130)
+        entry.pack(side=tk.LEFT, padx=5)
+
+        def onBrowse():
+            method_path = filedialog.askopenfilename(parent=self, title="Select Method File", filetypes=[("Method Files", "*.meth"), ("All Files", "*.*")])
+            if method_path:
+                var.set(method_path)
+            return
+
+        button = tk.Button(frame, text="Browse", command=onBrowse)
+        button.pack(side=tk.LEFT)
+
+        return frame
+
+
 #########
         ##   Old Exception Handlers from the old version for dealing with Sample List issues
 
