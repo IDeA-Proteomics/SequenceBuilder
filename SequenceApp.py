@@ -132,6 +132,9 @@ class TreeFrame(tk.Frame):
         self.datamodel = datamodel
         tk.Frame.__init__(self, self.parent)
 
+        self.columns = ['Num', 'Sample ID', 'File Name', 'Position', 'Instrument Method']
+        self.col_widths = [50, 80, 350, 70, 500]
+
         # Theme / style
         style = ttk.Style(self.root_window)
         try:
@@ -143,10 +146,10 @@ class TreeFrame(tk.Frame):
             pass
         style.configure("Treeview", rowheight=24)
 
-        columns, data = self.getSequenceData()
+        data = self.getSequenceData()
 
          # Treeview
-        self.tree = ttk.Treeview(self, columns=columns, show="headings", selectmode="browse")
+        self.tree = ttk.Treeview(self, columns=self.columns, show="headings", selectmode="browse")
 
         # Scrollbars
         vsb = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
@@ -161,9 +164,9 @@ class TreeFrame(tk.Frame):
         hsb.grid(row=1, column=0, sticky="ew")
 
          # Columns
-        for col in columns:
+        for col, width in zip(self.columns, self.col_widths):
             self.tree.heading(col, text=col, anchor="w")
-            self.tree.column(col, anchor="w", stretch=True, width=120)
+            self.tree.column(col, anchor="w", stretch=False if col != 'Instrument Method' else True,  width=width)
 
         # Data
         for row in data:
@@ -174,8 +177,6 @@ class TreeFrame(tk.Frame):
     
     def getSequenceData(self):
 
-        columns = ['Num', 'Sample ID', 'File Name', 'Position', 'Instrument Method']
-
         data = list(zip(self.datamodel.sequence_builder.sequence.index,
                         self.datamodel.sequence_builder.sequence['Sample ID'],
                         self.datamodel.sequence_builder.sequence['File Name'],
@@ -183,14 +184,19 @@ class TreeFrame(tk.Frame):
                         self.datamodel.sequence_builder.sequence['Instrument Method']
                         ))
 
-        return columns, data
+        return data
     
     def refresh(self):
         for child in self.tree.get_children():
             self.tree.delete(child)
-        _, data = self.getSequenceData()
+        data = self.getSequenceData()
         for row in data:
             self.tree.insert("", "end", values=row)
+        return
+    
+
+
+    
 
 
 class SequenceApp():
