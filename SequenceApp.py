@@ -53,6 +53,7 @@ class InstrumentFrame(tk.Frame):
 
         self.method_combo = ttk.Combobox(self, textvariable=self.datamodel.getOptionVar('method'), values=self.datamodel.method_list, state='readonly', width=100)
         self.method_combo.pack(side=tk.TOP, anchor=tk.E)
+        self.method_combo.bind('<<ComboboxSelected>>', self.onChange)
 
         self.onInstrumentChange()
 
@@ -192,7 +193,7 @@ class SequenceApp():
 
         return
     
-    def onInstrumentChange(self):
+    def onInstrumentChange(self, event=None):
         self.option_frame.onChange()
         self.refreshSequence()
         return
