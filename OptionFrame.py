@@ -99,6 +99,7 @@ class OptionFrame(tk.Frame):
         combo_vals = [None]
         if self.datamodel.project_loaded:
             combo_vals += self.datamodel.sorted_list
+        self.datamodel.setOption('test_sample', "None")
         self.test_combo.config(values=combo_vals)
         self.onChange()
         return
