@@ -6,9 +6,7 @@ import os
 class SequenceBuilder(object):
 
     def __init__(self, datamodel):
-        self.datamodel = datamodel
-
-        
+        self.datamodel = datamodel        
         
         self.pool_count = 0
         self.blank_count = 0
@@ -153,17 +151,17 @@ class SequenceBuilder(object):
         ts = self.datamodel.getOption('test_sample')                
         if ts != "None":
             self.addToSequence(self.createSample(ts+'_TEST', 'T', positions[ts], 2.0))
+        
+        ###  pre-qc
+        if self.datamodel.getOption('pre_qc'):
+            self.addToSequence(self.createRinse(which='pre-qc'))
+            self.addToSequence(self.createBlank(which='pre-qc'))
+            self.addToSequence(self.createQC(which='pre'))
 
         ###  pre-blank
         if self.datamodel.getOption('pre_blank'):
             self.addToSequence(self.createRinse(which='pre'))
             self.addToSequence(self.createBlank(which='pre'))
-        
-        ###  pre-qc
-        if self.datamodel.getOption('pre_qc'):
-            self.addToSequence(self.createQC(which='pre'))
-            self.addToSequence(self.createRinse(which='pre-qc'))
-            self.addToSequence(self.createBlank(which='pre-qc'))
 
         ###  Samples       
         for i, s in enumerate(self.datamodel.sample_list):  ## sample_list will be randomized by datamodel if necessary
@@ -180,8 +178,8 @@ class SequenceBuilder(object):
 
         ###  post-qc
         if self.datamodel.getOption('post_qc'):
-            self.addToSequence(self.createRinse(which='post-q'))            
-            self.addToSequence(self.createBlank(which='post-q'))
+            self.addToSequence(self.createRinse(which='post-qc'))            
+            self.addToSequence(self.createBlank(which='post-qc'))
             self.addToSequence(self.createQC(which='post'))
 
         ###  post-blank

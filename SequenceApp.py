@@ -48,7 +48,7 @@ class InstrumentFrame(tk.Frame):
         self.dda_button.pack(side=tk.LEFT, anchor=tk.E)
         self.dia_button.pack(side=tk.LEFT, anchor=tk.E)
 
-        self.edit_methods_button = tk.Button(self.top_frame, text="Edit Method List", command=onEdit)
+        self.edit_methods_button = tk.Button(self.top_frame, text="Instrument Settings", command=onEdit)
         self.edit_methods_button.pack(side=tk.LEFT, anchor=tk.E, padx=30)
 
         self.method_combo = ttk.Combobox(self, textvariable=self.datamodel.getOptionVar('method'), values=self.datamodel.method_list, state='readonly', width=100)
@@ -232,13 +232,6 @@ class SequenceApp():
         self.datamodel.onCreateSampleList(filename)
         return
     
-    # def editmenu_edit_methods(self):
-    #     dlg = EditMethodsDialog(self.root_window, self.datamodel)
-    #     if dlg.result is not None:
-    #         self.datamodel.instrument_data[self.datamodel.getOption('instrument')]['methods'][self.datamodel.getOption('diadda')] = dlg.result
-    #         self.datamodel.save_instrument_data()
-    #         self.instrument_frame.onInstrumentChange()
-    #     return
     
     def editmenu_settings(self):
         dlg = SettingsDialog(self.root_window, self.datamodel)
@@ -250,6 +243,7 @@ class SequenceApp():
         self.onInstrumentChange()
         self.instrument_frame.onInstrumentChange()
         return
+    
 
     
     def createMenu(self):
@@ -262,7 +256,7 @@ class SequenceApp():
         self.editmenu_items = {
             # 'Edit Methods':self.editmenu_edit_methods,
             'Settings':self.editmenu_settings,
-            'Instrument Settings':self.editmenu_instrument_settings
+            'Instrument Settings':self.editmenu_instrument_settings,
             }
 
         self.menubar = Menu(self.root_window)
@@ -284,7 +278,10 @@ class SequenceApp():
 
 
 
-
+def show_uncaught_exception(exc_type, exc_value, exc_traceback):
+    """Global function to catch unhandled exceptions"""
+    messagebox.showerror(f"Error: {exc_type.__name__}", message=f"An unexpected {exc_type.__name__} error occurred:\n\n{exc_value}")
+    return
 
 
 
@@ -296,6 +293,7 @@ def startSequenceApp():
     # root.iconbitmap("IDEA_Logo.ico")
     root.title("IDEA Sequence Builder")
     app = SequenceApp(root)
+    root.report_callback_exception = show_uncaught_exception
     root.mainloop()
 
 
