@@ -124,6 +124,73 @@ class ListText(tk.Text):
         return
 
 
+class TreeFrame(tk.Frame):
+    def __init__(self, parent, root_window, datamodel):
+
+        self.parent = parent    
+        self.root_window = root_window
+        self.datamodel = datamodel
+        tk.Frame.__init__(self, self.parent)
+
+        # Theme / style
+        style = ttk.Style(self.root_window)
+        try:
+            if "vista" in style.theme_names():
+                style.theme_use("vista")
+            else:
+                style.theme_use("clam")
+        except tk.TclError:
+            pass
+        style.configure("Treeview", rowheight=24)
+
+        columns, data = self.getSequenceData()
+
+         # Treeview
+        self.tree = ttk.Treeview(self, columns=columns, show="headings", selectmode="browse")
+
+        # Scrollbars
+        vsb = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
+        hsb = ttk.Scrollbar(self, orient="horizontal", command=self.tree.xview)
+        self.tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
+
+        # Layout
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.tree.grid(row=0, column=0, sticky="nsew")
+        vsb.grid(row=0, column=1, sticky="ns")
+        hsb.grid(row=1, column=0, sticky="ew")
+
+         # Columns
+        for col in columns:
+            self.tree.heading(col, text=col, anchor="w")
+            self.tree.column(col, anchor="w", stretch=True, width=120)
+
+        # Data
+        for row in data:
+            self.tree.insert("", "end", values=row)
+
+
+        return
+    
+    def getSequenceData(self):
+
+        columns = ['Num', 'Sample ID', 'File Name', 'Position', 'Instrument Method']
+
+        data = list(zip(self.datamodel.sequence_builder.sequence.index,
+                        self.datamodel.sequence_builder.sequence['Sample ID'],
+                        self.datamodel.sequence_builder.sequence['File Name'],
+                        self.datamodel.sequence_builder.sequence['Position'],
+                        self.datamodel.sequence_builder.sequence['Instrument Method']
+                        ))
+
+        return columns, data
+    
+    def refresh(self):
+        for child in self.tree.get_children():
+            self.tree.delete(child)
+        _, data = self.getSequenceData()
+        for row in data:
+            self.tree.insert("", "end", values=row)
 
 
 class SequenceApp():
@@ -160,8 +227,11 @@ class SequenceApp():
         self.head = HeaderFrame(self.top_frame, self.datamodel)
         self.head.pack(side = tk.LEFT, anchor=tk.W)
 
-        self.list_frame = ListFrame(self.left_frame, self.datamodel)
-        self.list_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
+        # self.list_frame = ListFrame(self.left_frame, self.datamodel)
+        # self.list_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
+
+        self.tree_frame = TreeFrame(self.left_frame, self.root_window, self.datamodel)
+        self.tree_frame.pack(anchor=tk.NW, fill=tk.BOTH, expand=True)
 
         self.option_frame = OptionFrame(self.right_frame, self.datamodel, onStartChange=self.refreshSequence, onRandom=self.onRandom)
         self.option_frame.pack(side=tk.TOP)
@@ -189,10 +259,6 @@ class SequenceApp():
         self.refreshSequence()
         
     
-    def onCreate(self):
-
-        return
-    
     def onInstrumentChange(self, event=None):
         self.option_frame.onChange()
         self.refreshSequence()
@@ -204,7 +270,8 @@ class SequenceApp():
 
     def refreshSequence(self):
         self.datamodel.refreshSequence()
-        self.list_frame.refreshProject()
+        # self.list_frame.refreshProject()
+        self.tree_frame.refresh()
 
 
     
