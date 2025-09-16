@@ -25,7 +25,7 @@ class DataModel():
         self.project_loaded = False
 
         self.options = {
-            'vertical':tk.BooleanVar(value=True),
+            'vertical':tk.BooleanVar(value=self.settings.default_vertical),
             'pool':tk.IntVar(value=1),
             'gpf':tk.IntVar(value=0),
             'random':tk.IntVar(value=0),

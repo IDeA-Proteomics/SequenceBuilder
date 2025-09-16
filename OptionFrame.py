@@ -40,8 +40,14 @@ class OptionFrame(tk.Frame):
 
         tk.Frame.__init__(self, self.parent)
 
-        self.vertical_check = tk.Checkbutton(self, text="Vertical Plate", variable=self.datamodel.getOptionVar('vertical'), onvalue=1, offvalue=0, command=self.onChange)
-        self.vertical_check.pack()
+        self.layout_frame = tk.Frame(self, bd=5, highlightbackground="black", highlightthickness=2)
+        self.layout_frame.pack(fill=tk.X, pady=5)
+        self.layout_label = tk.Label(self.layout_frame, text="Plate Layout", font=(None, 14, 'bold'))
+        self.layout_label.pack()
+        self.vertical_radio = tk.Radiobutton(self.layout_frame, text="Vertical Plate", font=(None, 12), variable=self.datamodel.getOptionVar('vertical'), value=True, command=self.onChange)
+        self.horizontal_radio = tk.Radiobutton(self.layout_frame, text="Horizontal Plate", font=(None, 12), variable=self.datamodel.getOptionVar('vertical'), value=False, command=self.onChange)
+        self.vertical_radio.pack()
+        self.horizontal_radio.pack()
 
         self.tray_label = tk.Label(self, text="Tray Selection")
         self.tray_label.pack()

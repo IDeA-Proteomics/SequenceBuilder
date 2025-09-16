@@ -108,6 +108,19 @@ class SettingsDialog(tk.Toplevel):
         self.default_instrument_combo = ttk.Combobox(self.default_instrument_frame, textvariable=self.default_instrument_var, values=self.datamodel.instrument_list, state='readonly', width=20)
         self.default_instrument_combo.pack(side=tk.TOP)
 
+        ###  Default Plate Layout
+        self.default_plate_frame = tk.Frame(self.container, highlightbackground="black", highlightthickness=2)
+        self.default_plate_frame.pack(side=tk.TOP, fill=tk.X, pady=5)
+
+        self.default_plate_label = tk.Label(self.default_plate_frame, text="Default Plate Layout:")
+        self.default_plate_label.pack(side=tk.TOP)
+        
+        self.plate_layout_var = tk.BooleanVar(value=self.settings.default_vertical)
+        self.vertical_radio = tk.Radiobutton(self.default_plate_frame, text="Vertical Plate", font=(None, 12), variable=self.plate_layout_var, value=True)
+        self.horizontal_radio = tk.Radiobutton(self.default_plate_frame, text="Horizontal Plate", font=(None, 12), variable=self.plate_layout_var, value=False)
+        self.vertical_radio.pack()
+        self.horizontal_radio.pack()    
+
         ###  Buttons
 
         self.button_frame = tk.Frame(self.container)
@@ -127,6 +140,7 @@ class SettingsDialog(tk.Toplevel):
     def onDone(self):
         self.settings.default_tray = self.default_tray_var.get()
         self.settings.default_instrument = self.default_instrument_var.get()
+        self.settings.default_vertical = self.plate_layout_var.get()
         self.datamodel.settings.saveToFile()
         self.destroy()
         return
