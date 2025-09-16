@@ -25,6 +25,7 @@ class DataModel():
         self.project_loaded = False
 
         self.options = {
+            'vertical':tk.BooleanVar(value=True),
             'pool':tk.IntVar(value=1),
             'gpf':tk.IntVar(value=0),
             'random':tk.IntVar(value=0),
@@ -194,8 +195,11 @@ class DataModel():
     #     return int(self.blank_every_var.get())
     
     
-    def getTrayPositions(self, tray):        
-        return [f"{tray}{self.getInstrumentData('tray_separator')}{row}{str(pos)}" for row in self.row_labels for pos in range(1,13)]
+    def getTrayPositions(self, tray):   
+        if self.getOption('vertical'):
+            return [f"{tray}{self.getInstrumentData('tray_separator')}{row}{str(pos)}" for pos in range(1,13) for row in self.row_labels]
+        else:     
+            return [f"{tray}{self.getInstrumentData('tray_separator')}{row}{str(pos)}" for row in self.row_labels for pos in range(1,13)]
     
     
     def onInstrumentSelection(self):

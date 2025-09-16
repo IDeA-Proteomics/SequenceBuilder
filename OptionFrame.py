@@ -40,6 +40,9 @@ class OptionFrame(tk.Frame):
 
         tk.Frame.__init__(self, self.parent)
 
+        self.vertical_check = tk.Checkbutton(self, text="Vertical Plate", variable=self.datamodel.getOptionVar('vertical'), onvalue=1, offvalue=0, command=self.onChange)
+        self.vertical_check.pack()
+
         self.tray_label = tk.Label(self, text="Tray Selection")
         self.tray_label.pack()
 
